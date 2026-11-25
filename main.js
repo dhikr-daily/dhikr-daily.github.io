@@ -15582,9 +15582,6 @@ Error generating stack: ` + i.message + `
       if (ms.retry) set2({ retry: "" });
       orig(e6);
     })(r.onresult);
-    r.onaudiostart = () => {
-      fails = 0;
-    };
     r.onerror = (e6) => {
       const c6 = e6?.error || "error";
       if (c6 === "no-speech" || c6 === "aborted") return;
@@ -15605,7 +15602,7 @@ Error generating stack: ` + i.message + `
         if (!everWorked && fails >= 3) {
           want = false;
           onNetworkFail?.();
-          set2({ on: false, listening: false, speaking: false, retry: "", error: "\u062E\u062F\u0645\u0629 \u0627\u0644\u062A\u0639\u0631\u0641 \u0639\u0644\u0649 \u0627\u0644\u0643\u0644\u0627\u0645 \u0628\u0625\u0646\u062A\u0631\u0646\u062A \u0645\u0634 \u0634\u063A\u0627\u0644\u0629 \u0641\u064A \u0627\u0644\u0645\u062A\u0635\u0641\u062D \u0623\u0648 \u0627\u0644\u062A\u0637\u0628\u064A\u0642 \u062F\u0647\u060C \u0631\u063A\u0645 \u0625\u0646 \u0627\u0644\u0646\u062A \u0634\u063A\u0627\u0644. \u0627\u0633\u062A\u062E\u062F\u0645 \u0648\u0636\u0639 \xAB\u0628\u062F\u0648\u0646 \u0625\u0646\u062A\u0631\u0646\u062A\xBB \u0623\u0648 \u062C\u0631\u0651\u0628 Chrome." });
+          set2({ on: false, listening: false, speaking: false, retry: "", error: "\u062E\u062F\u0645\u0629 \u0627\u0644\u062A\u0639\u0631\u0641 \u0639\u0644\u0649 \u0627\u0644\u0643\u0644\u0627\u0645 \u0628\u0625\u0646\u062A\u0631\u0646\u062A \u0645\u0634 \u0634\u063A\u0627\u0644\u0629 \u0641\u064A \u0627\u0644\u0645\u062A\u0635\u0641\u062D \u0623\u0648 \u0627\u0644\u062A\u0637\u0628\u064A\u0642 \u062F\u0647\u060C \u0631\u063A\u0645 \u0625\u0646 \u0627\u0644\u0646\u062A \u0634\u063A\u0627\u0644. \u0627\u0631\u062C\u0639 \u0644\u0648\u0636\u0639 \xAB\u0628\u0625\u0646\u062A\u0631\u0646\u062A\xBB \u0648\u0627\u0636\u063A\u0637 \xAB\u0641\u062D\u0635 \u0627\u0644\u0645\u064A\u0643\u0631\u0648\u0641\u0648\u0646\xBB \u0639\u0634\u0627\u0646 \u062A\u0639\u0631\u0641 \u0627\u0644\u0633\u0628\u0628\u060C \u0623\u0648 \u0627\u0633\u062A\u062E\u062F\u0645 \u0648\u0636\u0639 \xAB\u0628\u062F\u0648\u0646 \u0625\u0646\u062A\u0631\u0646\u062A\xBB\u060C \u0623\u0648 \u062C\u0631\u0651\u0628 Chrome." });
           return;
         }
         set2({ retry: fails >= 4 ? "\u0627\u0644\u0627\u062A\u0635\u0627\u0644 \u0628\u062E\u062F\u0645\u0629 \u0627\u0644\u062A\u0639\u0631\u0641 \u0639\u0644\u0649 \u0627\u0644\u0643\u0644\u0627\u0645 \u0628\u0637\u064A\u0621 \u0623\u0648 \u0645\u062A\u0642\u0637\u0639. \u0628\u062D\u0627\u0648\u0644 \u062A\u0627\u0646\u064A\u2026" : "\u0628\u064A\u0639\u064A\u062F \u0627\u0644\u0627\u062A\u0635\u0627\u0644\u2026" });
@@ -17212,6 +17209,7 @@ Error generating stack: ` + i.message + `
         off.note && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "dz-mic-note", children: off.note }),
         /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SessionLine, {}),
         off.error && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "dz-mic-err", children: off.error }),
+        ms2.error && !off.error && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "dz-mic-err", children: ms2.error }),
         /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", { type: "button", className: "dz-undo", onClick: () => setTrain(!train), "aria-expanded": train, children: [
           train ? "\u0625\u062E\u0641\u0627\u0621" : "\u{1F393} \u062A\u0633\u062C\u064A\u0644 \u0635\u0648\u062A\u0643 \u0639\u0644\u0649 \u0627\u0644\u0623\u0630\u0643\u0627\u0631",
           " ",
