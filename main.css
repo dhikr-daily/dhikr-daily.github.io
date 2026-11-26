@@ -2545,3 +2545,10 @@ html #root .dzb-row * {
   text-decoration: none;
   text-align: center;
 }
+.dz-dlpage {
+  padding: 8px 4px 24px;
+}
+.dz-dl-h {
+  text-align: center;
+  margin: 12px 0 16px;
+}

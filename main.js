@@ -18607,13 +18607,6 @@ Error generating stack: ` + i.message + `
         ] }),
         /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: "dz-undo", onClick: () => setUi({ ...UI0, dim: ui.dim, gper: ui.gper, gbase: ui.gbase, gsnd: ui.gsnd, gvol: ui.gvol }), children: "\u0625\u0639\u0627\u062F\u0629 \u0627\u0644\u0636\u0628\u0637 \u0627\u0644\u0627\u0641\u062A\u0631\u0627\u0636\u064A" })
       ] }),
-      !barAvailable() && /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(Section, { title: "\u062A\u062D\u0645\u064A\u0644", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-pair", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("a", { className: "dz-opt dz-dl", href: "https://files.instinct.com/dmw7kvcxvrz6", target: "_blank", rel: "noopener noreferrer", children: "\u{1F5A5}\uFE0F \u0648\u064A\u0646\u062F\u0648\u0632 (\u0628\u0631\u0646\u0627\u0645\u062C)" }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("a", { className: "dz-opt dz-dl", href: "DhikrCounter.apk", download: true, children: "\u{1F4F1} \u0623\u0646\u062F\u0631\u0648\u064A\u062F (APK)" })
-        ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { className: "dz-dim-note", children: "\u0648\u064A\u0646\u062F\u0648\u0632: \u0627\u0641\u062A\u062D \u0627\u0644\u0635\u0641\u062D\u0629 \u0648\u0627\u0636\u063A\u0637 \u062A\u062D\u0645\u064A\u0644\u060C \u0641\u0643 \u0627\u0644\u0636\u063A\u0637 \u0648\u0634\u063A\u0651\u0644 DhikrCounter.exe. \u0623\u0646\u062F\u0631\u0648\u064A\u062F: \u0646\u0632\u0651\u0644 \u0627\u0644\u0645\u0644\u0641 \u0648\u0627\u0641\u062A\u062D\u0647 (\u0645\u0645\u0643\u0646 \u062A\u0633\u0645\u062D \u0628\u0627\u0644\u062A\u062B\u0628\u064A\u062A \u0645\u0646 \u0627\u0644\u0645\u062A\u0635\u0641\u062D)." })
-      ] }),
       /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(Section, { title: "\u0627\u0644\u0627\u0647\u062A\u0632\u0627\u0632", children: [
         /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-pair", children: [
           /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: ui.vib ? "dz-opt is-on" : "dz-opt", onClick: () => setUi({ ...ui, vib: true }), children: "\u062A\u0634\u063A\u064A\u0644" }),
@@ -18632,8 +18625,18 @@ Error generating stack: ` + i.message + `
       /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(BackupBox, { backup })
     ] });
   }
+  function DownloadPage() {
+    return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-dlpage", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("h2", { className: "dz-dl-h", children: "\u062A\u062D\u0645\u064A\u0644 \u0627\u0644\u0628\u0631\u0646\u0627\u0645\u062C" }),
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-pair", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("a", { className: "dz-opt dz-dl", href: "https://files.instinct.com/dmw7kvcxvrz6", target: "_blank", rel: "noopener noreferrer", children: "\u{1F5A5}\uFE0F \u0648\u064A\u0646\u062F\u0648\u0632 (\u0628\u0631\u0646\u0627\u0645\u062C)" }),
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("a", { className: "dz-opt dz-dl", href: "DhikrCounter.apk", download: true, children: "\u{1F4F1} \u0623\u0646\u062F\u0631\u0648\u064A\u062F (APK)" })
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { className: "dz-dim-note", children: "\u0648\u064A\u0646\u062F\u0648\u0632: \u0627\u0641\u062A\u062D \u0627\u0644\u0635\u0641\u062D\u0629 \u0648\u0627\u0636\u063A\u0637 \u062A\u062D\u0645\u064A\u0644\u060C \u0641\u0643 \u0627\u0644\u0636\u063A\u0637 \u0648\u0634\u063A\u0651\u0644 DhikrCounter.exe. \u0623\u0646\u062F\u0631\u0648\u064A\u062F: \u0646\u0632\u0651\u0644 \u0627\u0644\u0645\u0644\u0641 \u0648\u0627\u0641\u062A\u062D\u0647 (\u0645\u0645\u0643\u0646 \u062A\u0633\u0645\u062D \u0628\u0627\u0644\u062A\u062B\u0628\u064A\u062A \u0645\u0646 \u0627\u0644\u0645\u062A\u0635\u0641\u062D)." })
+    ] });
+  }
   function NavBars({ tab, setTab, sub, setSub, where }) {
-    const tabs = [["count", "\u0627\u0644\u0639\u062F\u0627\u062F"], ["multi", "\u0627\u0644\u0630\u0643\u0631 \u0627\u0644\u0645\u0636\u0627\u0639\u0641"], ["listen", "\u0627\u0633\u062A\u0645\u0639 \u0644\u0644\u0623\u0630\u0643\u0627\u0631"], ["stats", "\u0627\u0644\u0625\u062D\u0635\u0627\u0621\u0627\u062A"], ["look", "\u0627\u0644\u0645\u0638\u0647\u0631 \u0648\u0627\u0644\u0625\u0639\u062F\u0627\u062F\u0627\u062A"]];
+    const tabs = [["count", "\u0627\u0644\u0639\u062F\u0627\u062F"], ["multi", "\u0627\u0644\u0630\u0643\u0631 \u0627\u0644\u0645\u0636\u0627\u0639\u0641"], ["listen", "\u0627\u0633\u062A\u0645\u0639 \u0644\u0644\u0623\u0630\u0643\u0627\u0631"], ["stats", "\u0627\u0644\u0625\u062D\u0635\u0627\u0621\u0627\u062A"], ["look", "\u0627\u0644\u0645\u0638\u0647\u0631 \u0648\u0627\u0644\u0625\u0639\u062F\u0627\u062F\u0627\u062A"], ...barAvailable() ? [] : [["dl", "\u062A\u062D\u0645\u064A\u0644"]]];
     return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("nav", { className: `dz-nav dz-nav-${where}`, "aria-label": "\u0627\u0644\u0623\u0642\u0633\u0627\u0645", children: [
       /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "dz-tabs", role: "tablist", children: tabs.map(([k, label2]) => /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", role: "tab", "aria-selected": tab === k, className: tab === k ? "dz-tab is-on" : "dz-tab", onClick: () => setTab(k), children: label2 }, k)) }),
       tab === "count" && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "dz-subs", children: SUBS.map(([k, label2]) => /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: sub === k ? "dz-sub is-on" : "dz-sub", onClick: () => setSub(k), children: sig(label2) }, k)) })
@@ -18865,7 +18868,7 @@ Error generating stack: ` + i.message + `
     const setTabX = (t) => go2(t, sub, baseId);
     const setSubX = (x) => go2("count", x, baseId);
     const setBaseX = (b) => go2("multi", sub, b);
-    const where = (l) => l.tab === "count" ? SUBS.find((x) => x[0] === l.sub)?.[1] || "\u0627\u0644\u0639\u062F\u0627\u062F" : l.tab === "multi" ? `\u0627\u0644\u0630\u0643\u0631 \u0627\u0644\u0645\u0636\u0627\u0639\u0641 \xB7 ${BASES.find((b) => b.id === l.base)?.text || "\u0643\u0644 \u0627\u0644\u0623\u0630\u0643\u0627\u0631 \u0645\u062C\u0645\u0639\u0629"}` : l.tab === "stats" ? "\u0627\u0644\u0625\u062D\u0635\u0627\u0621\u0627\u062A" : l.tab === "listen" ? "\u0627\u0633\u062A\u0645\u0639 \u0644\u0644\u0623\u0630\u0643\u0627\u0631" : "\u0627\u0644\u0645\u0638\u0647\u0631 \u0648\u0627\u0644\u0625\u0639\u062F\u0627\u062F\u0627\u062A";
+    const where = (l) => l.tab === "count" ? SUBS.find((x) => x[0] === l.sub)?.[1] || "\u0627\u0644\u0639\u062F\u0627\u062F" : l.tab === "multi" ? `\u0627\u0644\u0630\u0643\u0631 \u0627\u0644\u0645\u0636\u0627\u0639\u0641 \xB7 ${BASES.find((b) => b.id === l.base)?.text || "\u0643\u0644 \u0627\u0644\u0623\u0630\u0643\u0627\u0631 \u0645\u062C\u0645\u0639\u0629"}` : l.tab === "stats" ? "\u0627\u0644\u0625\u062D\u0635\u0627\u0621\u0627\u062A" : l.tab === "listen" ? "\u0627\u0633\u062A\u0645\u0639 \u0644\u0644\u0623\u0630\u0643\u0627\u0631" : l.tab === "dl" ? "\u062A\u062D\u0645\u064A\u0644" : "\u0627\u0644\u0645\u0638\u0647\u0631 \u0648\u0627\u0644\u0625\u0639\u062F\u0627\u062F\u0627\u062A";
     const showResume = !touched && savedLast.ready && (last.tab !== "count" || last.sub !== "singles");
     const backup = {
       make: () => JSON.stringify({ v: 1, daily: store.daily, rest: store.rest, chains: chains.all, goals, streak, ui: merged, custom: cuList, start: startD }),
@@ -18959,6 +18962,7 @@ Error generating stack: ` + i.message + `
         tab === "multi" && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(MultiPage, { store, today: p.today, chains, baseId, setBaseId: setBaseX }),
         tab === "listen" && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(ListenPage, {}),
         tab === "stats" && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(StatsPage, { store, start: startD, setStart: setStartD, hist: Array.isArray(hist) ? hist : [] }),
+        tab === "dl" && !barAvailable() && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(DownloadPage, {}),
         tab === "look" && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(Look, { ui: merged, setUi: update, goals, setGoals: (g) => {
           if (savedGoals.ready) setGoals(g);
         }, streak, backup, store })
