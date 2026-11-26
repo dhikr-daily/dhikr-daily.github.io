@@ -17943,7 +17943,8 @@ Error generating stack: ` + i.message + `
     const off = useOff();
     const [diag, setDiag] = (0, import_react5.useState)(false);
     const [saved, setSaved, sv] = useLocalState("dz.tpl.v1", {});
-    const [engine, setEngine] = (0, import_react5.useState)(ms2.supported ? "online" : "offline");
+    const offlineOk = barAvailable();
+    const [engine, setEngine] = (0, import_react5.useState)(ms2.supported || !offlineOk ? "online" : "offline");
     const [fell, setFell] = (0, import_react5.useState)(false);
     const [train, setTrain] = (0, import_react5.useState)(false);
     const [mu, setMu, svu] = useLocalState("dz.micui.v1", { hidden: false, always: true });
@@ -17958,6 +17959,7 @@ Error generating stack: ` + i.message + `
       if (sv.ready) loadTemplates(saved, setSaved, OFF_NAMES);
     }, [sv.ready]);
     (0, import_react5.useEffect)(() => {
+      if (!offlineOk) return;
       setOnNetworkFail(() => {
         setEngine("offline");
         setFell(true);
@@ -18012,7 +18014,7 @@ Error generating stack: ` + i.message + `
       ] }),
       /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-mic-eng", children: [
         /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: engine === "online" ? "dz-opt is-on" : "dz-opt", disabled: !ms2.supported, onClick: () => switchTo("online"), children: "\u{1F310} \u0628\u0625\u0646\u062A\u0631\u0646\u062A (\u0627\u0644\u0645\u062A\u0635\u0641\u062D)" }),
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: engine === "offline" ? "dz-opt is-on" : "dz-opt", onClick: () => switchTo("offline"), children: "\u{1F4F4} \u0628\u062F\u0648\u0646 \u0625\u0646\u062A\u0631\u0646\u062A (\u062A\u062C\u0631\u064A\u0628\u064A)" })
+        offlineOk && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: engine === "offline" ? "dz-opt is-on" : "dz-opt", onClick: () => switchTo("offline"), children: "\u{1F4F4} \u0628\u062F\u0648\u0646 \u0625\u0646\u062A\u0631\u0646\u062A (\u062A\u062C\u0631\u064A\u0628\u064A)" })
       ] }),
       fell && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "dz-mic-note", children: "\u0645\u0641\u064A\u0634 \u0627\u062A\u0635\u0627\u0644 \u0628\u062E\u062F\u0645\u0629 \u0627\u0644\u062A\u0639\u0631\u0641 \u0639\u0644\u0649 \u0627\u0644\u0643\u0644\u0627\u0645\u060C \u0641\u0627\u062A\u062D\u0648\u0644\u0646\u0627 \u0644\u0644\u0648\u0636\u0639 \u0628\u062F\u0648\u0646 \u0625\u0646\u062A\u0631\u0646\u062A. \u0645\u062D\u062A\u0627\u062C \u062A\u0633\u062C\u0651\u0644 \u0635\u0648\u062A\u0643 \u0639\u0644\u0649 \u0627\u0644\u0623\u0630\u0643\u0627\u0631 \u0645\u0631\u0629 \u0648\u0627\u062D\u062F\u0629." }),
       engine === "online" && /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(import_jsx_runtime2.Fragment, { children: [
@@ -18050,7 +18052,7 @@ Error generating stack: ` + i.message + `
         /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "dz-mic-fine", children: "\u0627\u0633\u062A\u0647\u0644\u0627\u0643 \u0627\u0644\u0625\u0646\u062A\u0631\u0646\u062A: \u0627\u0644\u0635\u0648\u062A \u0628\u064A\u062A\u0628\u0639\u062A \u0644\u062E\u062F\u0645\u0629 \u0627\u0644\u062A\u0639\u0631\u0641 \u0639\u0644\u0649 \u0627\u0644\u0643\u0644\u0627\u0645 \u0637\u0648\u0644 \u0645\u0627 \u0627\u0644\u0645\u064A\u0643\u0631\u0648\u0641\u0648\u0646 \u0634\u063A\u0627\u0644 \u062D\u062A\u0649 \u0641\u064A \u0627\u0644\u0635\u0645\u062A. \u062A\u0642\u062F\u064A\u0631 \u062A\u0642\u0631\u064A\u0628\u064A \u0645\u0646 \u0642\u064A\u0627\u0633 \u0642\u062F\u064A\u0645: \u062D\u0648\u0627\u0644\u064A 70 \u0645\u064A\u062C\u0627 \u0641\u064A \u0627\u0644\u0633\u0627\u0639\u0629 (\u0642\u062F \u064A\u062E\u062A\u0644\u0641). \u0627\u0642\u0641\u0644 \u0627\u0644\u0645\u064A\u0643\u0631\u0648\u0641\u0648\u0646 \u0644\u0645\u0627 \u0645\u0634 \u0628\u062A\u0633\u062A\u062E\u062F\u0645\u0647." }),
         ms2.error && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "dz-mic-err", children: ms2.error })
       ] }),
-      engine === "offline" && /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(import_jsx_runtime2.Fragment, { children: [
+      offlineOk && engine === "offline" && /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(import_jsx_runtime2.Fragment, { children: [
         /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-mic-row", children: [
           /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: "dz-mic-btn", disabled: !sv.ready || nTrained === 0 || off.recId !== null, onClick: () => off.on ? stopOff() : startOffl(), "aria-pressed": off.on, children: off.on ? "\u23F9 \u0625\u064A\u0642\u0627\u0641" : "\u{1F399}\uFE0F \u0627\u0628\u062F\u0623 \u0627\u0644\u0639\u062F \u0628\u0627\u0644\u0635\u0648\u062A" }),
           /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: off.on || off.recId ? off.speaking ? "dz-led is-speak" : "dz-led is-live" : "dz-led" }),
@@ -18090,7 +18092,10 @@ Error generating stack: ` + i.message + `
           /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "dz-mic-note", children: "\u0627\u0644\u0623\u0630\u0643\u0627\u0631 \u0627\u0644\u0637\u0648\u064A\u0644\u0629 \u062C\u062F\u064B\u0627 \u0645\u0634 \u0645\u062F\u0639\u0648\u0645\u0629 \u0641\u064A \u0648\u0636\u0639 \u0628\u062F\u0648\u0646 \u0625\u0646\u062A\u0631\u0646\u062A." })
         ] })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "dz-mic-fine", children: "\u062A\u062C\u0631\u064A\u0628\u064A. \u0645\u0645\u0643\u0646 \u064A\u063A\u0644\u0637 \u0641\u0631\u0627\u062C\u0639 \u0627\u0644\u0639\u062F\u0651\u0627\u062F. \u0627\u0644\u0648\u0636\u0639 \u0628\u0625\u0646\u062A\u0631\u0646\u062A \u0628\u064A\u0633\u062A\u062E\u062F\u0645 \u062E\u062F\u0645\u0629 \u0627\u0644\u062A\u0639\u0631\u0641 \u0639\u0644\u0649 \u0627\u0644\u0643\u0644\u0627\u0645 \u0628\u062A\u0627\u0639\u0629 \u0627\u0644\u0645\u062A\u0635\u0641\u062D\u060C \u0648\u0627\u0644\u0648\u0636\u0639 \u0628\u062F\u0648\u0646 \u0625\u0646\u062A\u0631\u0646\u062A \u0628\u064A\u0637\u0627\u0628\u0642 \u0635\u0648\u062A\u0643 \u0639\u0644\u0649 \u0627\u0644\u0644\u064A \u0633\u062C\u0644\u062A\u0647 \u062C\u0648\u0647 \u0627\u0644\u062C\u0647\u0627\u0632 \u0628\u0633." })
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-mic-fine", children: [
+        "\u062A\u062C\u0631\u064A\u0628\u064A. \u0645\u0645\u0643\u0646 \u064A\u063A\u0644\u0637 \u0641\u0631\u0627\u062C\u0639 \u0627\u0644\u0639\u062F\u0651\u0627\u062F. \u0627\u0644\u0648\u0636\u0639 \u0628\u0625\u0646\u062A\u0631\u0646\u062A \u0628\u064A\u0633\u062A\u062E\u062F\u0645 \u062E\u062F\u0645\u0629 \u0627\u0644\u062A\u0639\u0631\u0641 \u0639\u0644\u0649 \u0627\u0644\u0643\u0644\u0627\u0645 \u0628\u062A\u0627\u0639\u0629 \u0627\u0644\u0645\u062A\u0635\u0641\u062D\u060C ",
+        offlineOk ? "\u0648\u0627\u0644\u0648\u0636\u0639 \u0628\u062F\u0648\u0646 \u0625\u0646\u062A\u0631\u0646\u062A \u0628\u064A\u0637\u0627\u0628\u0642 \u0635\u0648\u062A\u0643 \u0639\u0644\u0649 \u0627\u0644\u0644\u064A \u0633\u062C\u0644\u062A\u0647 \u062C\u0648\u0647 \u0627\u0644\u062C\u0647\u0627\u0632 \u0628\u0633." : ""
+      ] })
     ] });
   }
   function PageListen({ items, label: label2 }) {
@@ -18446,7 +18451,7 @@ Error generating stack: ` + i.message + `
       ] }) : /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(Paragraph, { children: "\u0627\u0628\u062F\u0623 \u0627\u0644\u0639\u062F \u0648\u0647\u062A\u0638\u0647\u0631 \u0647\u0646\u0627 \u0627\u0644\u0623\u0630\u0643\u0627\u0631 \u0645\u0631\u062A\u0628\u0629 \u0645\u0646 \u0627\u0644\u0623\u0643\u062B\u0631 \u0644\u0644\u0623\u0642\u0644." }) })
     ] });
   }
-  var UI0 = { mode: "light", skin: "emerald", font: "default", scale: 1, bold: false, vib: true, vol: 1 };
+  var UI0 = { mode: "dark", skin: "graphite", font: "cairo", scale: 1, bold: false, vib: true, vol: 1 };
   var SKINS = [
     {
       id: "emerald",
@@ -18601,6 +18606,13 @@ Error generating stack: ` + i.message + `
           /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: !ui.bold ? "dz-opt is-on" : "dz-opt", onClick: () => setUi({ ...ui, bold: false }), children: "\u0625\u0644\u063A\u0627\u0621 \u0627\u0644\u0639\u0631\u064A\u0636" })
         ] }),
         /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: "dz-undo", onClick: () => setUi({ ...UI0, dim: ui.dim, gper: ui.gper, gbase: ui.gbase, gsnd: ui.gsnd, gvol: ui.gvol }), children: "\u0625\u0639\u0627\u062F\u0629 \u0627\u0644\u0636\u0628\u0637 \u0627\u0644\u0627\u0641\u062A\u0631\u0627\u0636\u064A" })
+      ] }),
+      !barAvailable() && /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(Section, { title: "\u062A\u062D\u0645\u064A\u0644", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-pair", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("a", { className: "dz-opt dz-dl", href: "https://files.instinct.com/dmw7kvcxvrz6", target: "_blank", rel: "noopener noreferrer", children: "\u{1F5A5}\uFE0F \u0648\u064A\u0646\u062F\u0648\u0632 (\u0628\u0631\u0646\u0627\u0645\u062C)" }),
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("a", { className: "dz-opt dz-dl", href: "DhikrCounter.apk", download: true, children: "\u{1F4F1} \u0623\u0646\u062F\u0631\u0648\u064A\u062F (APK)" })
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { className: "dz-dim-note", children: "\u0648\u064A\u0646\u062F\u0648\u0632: \u0627\u0641\u062A\u062D \u0627\u0644\u0635\u0641\u062D\u0629 \u0648\u0627\u0636\u063A\u0637 \u062A\u062D\u0645\u064A\u0644\u060C \u0641\u0643 \u0627\u0644\u0636\u063A\u0637 \u0648\u0634\u063A\u0651\u0644 DhikrCounter.exe. \u0623\u0646\u062F\u0631\u0648\u064A\u062F: \u0646\u0632\u0651\u0644 \u0627\u0644\u0645\u0644\u0641 \u0648\u0627\u0641\u062A\u062D\u0647 (\u0645\u0645\u0643\u0646 \u062A\u0633\u0645\u062D \u0628\u0627\u0644\u062A\u062B\u0628\u064A\u062A \u0645\u0646 \u0627\u0644\u0645\u062A\u0635\u0641\u062D)." })
       ] }),
       /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(Section, { title: "\u0627\u0644\u0627\u0647\u062A\u0632\u0627\u0632", children: [
         /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-pair", children: [

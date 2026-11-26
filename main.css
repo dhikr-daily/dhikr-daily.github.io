@@ -2538,3 +2538,10 @@ html #root .dzb-row * {
 .dzb-setabove .dzb-col {
   flex-direction: column-reverse;
 }
+.dz-dl {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  text-align: center;
+}
