@@ -14274,7 +14274,7 @@ Error generating stack: ` + i.message + `
   }
 
   // src/App.tsx
-  var import_react4 = __toESM(require_react());
+  var import_react5 = __toESM(require_react());
 
   // src/player.ts
   var import_react = __toESM(require_react());
@@ -14351,6 +14351,7 @@ Error generating stack: ` + i.message + `
     ...BASES.flatMap((b) => variants(b))
   ];
   var TEXT = Object.fromEntries(ALL.map((i) => [i.id, i.text]));
+  var SAYYID_TEXT = "\u0627\u0644\u0644\u064E\u0651\u0647\u064F\u0645\u064E\u0651 \u0623\u064E\u0646\u0652\u062A\u064E \u0631\u064E\u0628\u0650\u0651\u064A \u0644\u064E\u0627 \u0625\u0650\u0644\u064E\u0647\u064E \u0625\u0650\u0644\u064E\u0651\u0627 \u0623\u064E\u0646\u0652\u062A\u064E\u060C \u062E\u064E\u0644\u064E\u0642\u0652\u062A\u064E\u0646\u0650\u064A \u0648\u064E\u0623\u064E\u0646\u064E\u0627 \u0639\u064E\u0628\u0652\u062F\u064F\u0643\u064E\u060C \u0648\u064E\u0623\u064E\u0646\u064E\u0627 \u0639\u064E\u0644\u064E\u0649 \u0639\u064E\u0647\u0652\u062F\u0650\u0643\u064E \u0648\u064E\u0648\u064E\u0639\u0652\u062F\u0650\u0643\u064E \u0645\u064E\u0627 \u0627\u0633\u0652\u062A\u064E\u0637\u064E\u0639\u0652\u062A\u064F\u060C \u0623\u064E\u0639\u064F\u0648\u0630\u064F \u0628\u0650\u0643\u064E \u0645\u0650\u0646\u0652 \u0634\u064E\u0631\u0650\u0651 \u0645\u064E\u0627 \u0635\u064E\u0646\u064E\u0639\u0652\u062A\u064F\u060C \u0623\u064E\u0628\u064F\u0648\u0621\u064F \u0644\u064E\u0643\u064E \u0628\u0650\u0646\u0650\u0639\u0652\u0645\u064E\u062A\u0650\u0643\u064E \u0639\u064E\u0644\u064E\u064A\u064E\u0651\u060C \u0648\u064E\u0623\u064E\u0628\u064F\u0648\u0621\u064F \u0644\u064E\u0643\u064E \u0628\u0650\u0630\u064E\u0646\u0652\u0628\u0650\u064A \u0641\u064E\u0627\u063A\u0652\u0641\u0650\u0631\u0652 \u0644\u0650\u064A\u060C \u0641\u064E\u0625\u0650\u0646\u064E\u0651\u0647\u064F \u0644\u064E\u0627 \u064A\u064E\u063A\u0652\u0641\u0650\u0631\u064F \u0627\u0644\u0630\u064F\u0651\u0646\u064F\u0648\u0628\u064E \u0625\u0650\u0644\u064E\u0651\u0627 \u0623\u064E\u0646\u0652\u062A\u064E";
 
   // src/clips.ts
   var CLIPS_B64 = {
@@ -15206,7 +15207,7 @@ Error generating stack: ` + i.message + `
     s3: ["\u0627\u0644\u0644\u0647 \u0627\u0643\u0628\u0631"]
   };
   var PHRASES = [
-    ...SOURCE.map((i) => ({ id: i.id, t: toks(i.text), long: toks(i.text).length >= 7 })),
+    ...SOURCE.map((i) => ({ id: i.id, t: toks(i.text), long: i.id !== "s4" && toks(i.text).length >= 7 })),
     ...BASES.flatMap((b) => variants(b)).map((i) => ({ id: i.id, t: toks(i.text), long: toks(i.text).length >= 7 })),
     ...Object.entries(ALIASES).flatMap(([id2, arr]) => arr.map((a) => ({ id: id2, t: toks(a), long: false })))
   ].sort((a, b) => b.t.length - a.t.length);
@@ -15228,6 +15229,9 @@ Error generating stack: ` + i.message + `
   var FUZZ = 0.82;
   var FUZZ_OVER_EXACT = 0.92;
   var FUZZ_ON = true;
+  var setFuzzy = (b) => {
+    FUZZ_ON = b;
+  };
   function bestAt(words, i) {
     let best = null;
     const exactAny = PHRASES.some((p) => !p.long && matchAt(words, i, p.t) > 0);
@@ -15248,6 +15252,9 @@ Error generating stack: ` + i.message + `
           let sc22 = sim(skelWords(win), sk);
           if (L === n && !win.every((w, k) => sim(skel(w), skel(p.t[k])) >= 0.7)) sc22 = Math.min(sc22, 0.5);
           if (L !== n && sc22 < 0.9) continue;
+          const pk = p.t.map(skel), wk = win.map(skel);
+          const anchored = (xs, ys) => xs.every((x) => x.length < 2 || ys.some((y) => sim(x, y) >= 0.65));
+          if (!anchored(pk, wk) || !anchored(wk, pk)) continue;
           if (sc22 >= thr && sc22 > sc2) {
             sc2 = sc22;
             len = L;
@@ -15299,7 +15306,7 @@ Error generating stack: ` + i.message + `
     let bestId = "", bestR = 0;
     for (const p of PHRASES.filter((x) => x.long)) {
       const r = lcs(words, p.t) / p.t.length;
-      if (r >= (p.id[0] === "m" ? 0.9 : 0.7) && r > bestR) {
+      if (r >= 0.85 && r > bestR) {
         bestR = r;
         bestId = p.id;
       }
@@ -15342,7 +15349,7 @@ Error generating stack: ` + i.message + `
     return out;
   }
   var SR2 = typeof window !== "undefined" ? window.SpeechRecognition || window.webkitSpeechRecognition : void 0;
-  var ms = { supported: !!SR2, on: false, listening: false, speaking: false, heard: "", error: "", note: "", last: 0, total: 0, lastIds: [], retry: "", diag: [] };
+  var ms = { supported: !!SR2, on: false, listening: false, speaking: false, heard: "", error: "", note: "", last: 0, total: 0, lastIds: [], retry: "", diag: [], seq: [], level: -1, weak: false };
   var subs2 = /* @__PURE__ */ new Set();
   var set2 = (p) => {
     ms = { ...ms, ...p };
@@ -15395,6 +15402,20 @@ Error generating stack: ` + i.message + `
     }
   }
   var IK = toks(IKHLAS_TEXT.replace(/\(\d+\)/g, " ")).filter((w) => !/^\d+$/.test(w));
+  var SY = toks(SAYYID_TEXT.replace(/[،,]/g, " "));
+  var syBuf = [];
+  function sayyidCheck(words, now) {
+    syBuf = syBuf.filter((x) => now - x.t < 6e4);
+    for (const w of words) syBuf.push({ w, t: now });
+    if (syBuf.length > 160) syBuf = syBuf.slice(-160);
+    if (syBuf.length < Math.floor(SY.length * 0.5)) return 0;
+    const arr = syBuf.map((x) => x.w);
+    if (lcs(arr, SY) >= Math.ceil(SY.length * 0.6) && /ابوء|اعوذ|خلقتني|عهدك/.test(arr.join(" "))) {
+      syBuf = [];
+      return 1;
+    }
+    return 0;
+  }
   var ikBuf = [];
   function ikhlasCheck(words, now) {
     ikBuf = ikBuf.filter((x) => now - x.t < 4e4);
@@ -15452,6 +15473,15 @@ Error generating stack: ` + i.message + `
     if (net !== 0) set2({ total: Math.max(0, ms.total + net) });
     if (Object.keys(got).length) addDiag(text, label(got).replace(/×-/g, "\u2212").replace(/×/g, "+"), false);
   }
+  function exactHits(words) {
+    const was = FUZZ_ON;
+    setFuzzy(false);
+    try {
+      return countHits(words);
+    } finally {
+      setFuzzy(was);
+    }
+  }
   function handleFinal(alts, key) {
     const now = Date.now();
     const first = alts[0] || "";
@@ -15462,9 +15492,25 @@ Error generating stack: ` + i.message + `
       const ids = [];
       let n = 0;
       const got = {};
+      const ex2 = exactHits(toks(first));
+      let swap = 0;
+      for (const id2 of Object.keys(h)) {
+        const d0 = (h[id2] || 0) - (have[id2] || 0);
+        if (d0 > 0 && (have[id2] || 0) === 0 && ex2[id2] > 0) swap += d0;
+        else if (d0 > 0 && have[id2]) swap += d0;
+      }
       for (const id2 of /* @__PURE__ */ new Set([...Object.keys(h), ...Object.keys(have)])) {
         let d = (h[id2] || 0) - (have[id2] || 0);
-        if (d < 0 && !(d <= -2 || !h[id2])) d = 0;
+        if (d < 0 && swap > 0 && isAmbig(id2)) {
+          const k = Math.min(-d, swap);
+          swap -= k;
+          got[id2] = -k;
+          handler?.(id2, -k);
+          continue;
+        }
+        if (d < 0) d = 0;
+        if (d > 0 && !have[id2] && !(exactHits(toks(first))[id2] > 0)) d = 0;
+        if (d > 0 && have[id2] && !((have[id2] || 0) > 0)) d = 0;
         if (d !== 0) {
           if (d > 0) {
             n += d;
@@ -15511,6 +15557,10 @@ Error generating stack: ` + i.message + `
         const k = ikhlasCheck(words, now);
         if (k > 0) hits["k0"] = k;
       }
+      if (text === alts[0] && sayyidCheck(words, now) > 0) {
+        for (const k of Object.keys(hits)) delete hits[k];
+        hits["i3"] = 1;
+      }
       const ids = Object.keys(hits);
       if (text === alts[0]) {
         lastTokens = full;
@@ -15533,8 +15583,66 @@ Error generating stack: ` + i.message + `
     set2({ note: "\u0633\u0645\u0639\u062A \u0643\u0644\u0627\u0645 \u0628\u0633 \u0645\u0634 \u0648\u0627\u062D\u062F \u0645\u0646 \u0627\u0644\u0623\u0630\u0643\u0627\u0631 \u0627\u0644\u0645\u0639\u0631\u0648\u0641\u0629" });
     addDiag(first, "\u0648\u0644\u0627 \u062D\u0627\u062C\u0629", true);
   }
+  var seqN = 0;
+  function attachGrammar(r) {
+    try {
+      const G3 = window.SpeechGrammarList || window.webkitSpeechGrammarList;
+      if (!G3) return;
+      const words = Array.from(new Set(MIC_ITEMS.flatMap((i) => norm(i.text).split(" ")).filter(Boolean)));
+      const g = new G3();
+      g.addFromString("#JSGF V1.0; grammar adhkar; public <w> = " + words.join(" | ") + ";", 1);
+      r.grammars = g;
+    } catch {
+    }
+  }
+  var lvCtx = null;
+  var lvStream = null;
+  var lvTimer = null;
+  async function startLevel() {
+    stopLevel();
+    try {
+      if (!navigator.mediaDevices?.getUserMedia) return;
+      lvStream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } });
+      if (!want) {
+        stopLevel();
+        return;
+      }
+      const AC2 = window.AudioContext || window.webkitAudioContext;
+      lvCtx = new AC2();
+      const an = lvCtx.createAnalyser();
+      an.fftSize = 1024;
+      lvCtx.createMediaStreamSource(lvStream).connect(an);
+      const buf = new Uint8Array(an.fftSize);
+      let peak = 0, since = Date.now();
+      lvTimer = setInterval(() => {
+        an.getByteTimeDomainData(buf);
+        let m = 0;
+        for (let i = 0; i < buf.length; i++) m = Math.max(m, Math.abs(buf[i] - 128) / 128);
+        peak = Math.max(peak * 0.98, m);
+        const weak = Date.now() - since > 6e3 && ms.speaking && peak < 0.08;
+        if (Math.abs(ms.level - peak) > 0.02 || weak !== ms.weak) set2({ level: peak, weak });
+      }, 250);
+    } catch {
+    }
+  }
+  function stopLevel() {
+    if (lvTimer) clearInterval(lvTimer);
+    lvTimer = null;
+    try {
+      lvStream?.getTracks().forEach((t) => t.stop());
+    } catch {
+    }
+    try {
+      lvCtx?.close();
+    } catch {
+    }
+    lvStream = null;
+    lvCtx = null;
+    if (ms.level !== -1 || ms.weak) set2({ level: -1, weak: false });
+  }
   function make() {
     const r = new SR2();
+    attachGrammar(r);
     r.lang = lang;
     r.continuous = true;
     r.interimResults = true;
@@ -15649,7 +15757,24 @@ Error generating stack: ` + i.message + `
       set2({ supported: false, error: "\u0627\u0644\u0645\u062A\u0635\u0641\u062D \u062F\u0647 \u0645\u0634 \u0628\u064A\u062F\u0639\u0645 \u0627\u0644\u062A\u0639\u0631\u0641 \u0639\u0644\u0649 \u0627\u0644\u0643\u0644\u0627\u0645. \u0627\u0633\u062A\u062E\u062F\u0645 Chrome \u0623\u0648 Edge \u0639\u0644\u0649 \u0627\u0644\u0643\u0645\u0628\u064A\u0648\u062A\u0631 \u0623\u0648 Chrome \u0639\u0644\u0649 \u0627\u0644\u0623\u0646\u062F\u0631\u0648\u064A\u062F." });
       return;
     }
-    handler = onHit;
+    seqN = 0;
+    handler = (id2, n) => {
+      let q = ms.seq.slice();
+      if (n > 0) {
+        for (let i = 0; i < n; i++) q.push({ n: ++seqN, id: id2 });
+      } else {
+        for (let i = 0; i < -n; i++) {
+          const at = q.map((x) => x.id).lastIndexOf(id2);
+          if (at >= 0) {
+            q.splice(at, 1);
+          }
+        }
+        q = q.map((x, k) => ({ ...x, n: k + 1 }));
+        seqN = q.length;
+      }
+      set2({ seq: q.slice(-60) });
+      onHit(id2, n);
+    };
     want = true;
     restarts = [];
     fails = 0;
@@ -15661,7 +15786,8 @@ Error generating stack: ` + i.message + `
     livePrev = {};
     Object.values(liveTimers).forEach(clearTimeout);
     liveTimers = {};
-    set2({ on: true, error: "", note: "", heard: "", last: 0, lastIds: [], retry: "", diag: [] });
+    set2({ on: true, error: "", note: "", heard: "", last: 0, lastIds: [], retry: "", diag: [], seq: [] });
+    startLevel();
     try {
       rec = make();
       rec.start();
@@ -15673,6 +15799,7 @@ Error generating stack: ` + i.message + `
   function stopMic(note = "") {
     want = false;
     handler = null;
+    stopLevel();
     try {
       rec?.abort();
     } catch {
@@ -16117,6 +16244,7 @@ Error generating stack: ` + i.message + `
     buf = [];
     pend = new Float32Array(0);
     noise = -60;
+    recent = [];
     speech = 0;
     quiet = 0;
     inSeg = false;
@@ -16140,12 +16268,16 @@ Error generating stack: ` + i.message + `
       for (let i = 0; i < f.length; i++) e6 += f[i] * f[i];
       const db2 = 10 * Math.log10(e6 / f.length + 1e-10);
       this.level = db2;
+      this.recent.push(db2);
+      if (this.recent.length > 90) this.recent.shift();
+      const floor = Math.min(...this.recent);
+      if (this.recent.length >= 30 && floor > this.noise) this.noise = Math.min(-25, this.noise + (floor - this.noise) * 0.1);
       const loud = db2 > this.noise + 9 && db2 > -48;
       if (!this.inSeg) {
         this.pre.push(f);
         if (this.pre.length > 6) this.pre.shift();
         if (!loud) {
-          this.noise = Math.min(-35, this.noise * 0.95 + db2 * 0.05);
+          this.noise = Math.min(-25, this.noise * 0.95 + db2 * 0.05);
           this.speech = 0;
           this.active = false;
           return;
@@ -16464,8 +16596,723 @@ Error generating stack: ` + i.message + `
     if (!wanted) closeAudio();
   }
 
-  // src/App.tsx
+  // src/bar.tsx
+  var import_react4 = __toESM(require_react());
   var import_jsx_runtime = __toESM(require_jsx_runtime());
+  var bridge = () => {
+    const b = window.dhikrBar;
+    if (typeof b === "function") return b;
+    try {
+      const p = window.parent;
+      if (p && p !== window && typeof p.__dzbWebBridge === "function") return (a, pl) => Promise.resolve(p.__dzbWebBridge(a, pl));
+    } catch {
+    }
+    return null;
+  };
+  var area = () => {
+    try {
+      const p = window.parent;
+      if (p && p !== window && p.__dzbArea) return p.__dzbArea();
+    } catch {
+    }
+    const sc2 = window.screen;
+    return { availWidth: sc2.availWidth || 1280, availHeight: sc2.availHeight || 720, availLeft: sc2.availLeft || 0, availTop: sc2.availTop || 0 };
+  };
+  var barAvailable = () => bridge() !== null;
+  var call = (action, payload) => {
+    const b = bridge();
+    if (!b) return Promise.resolve('{"ok":false,"mock":true}');
+    try {
+      return b(action, JSON.stringify(payload));
+    } catch {
+      return Promise.resolve('{"ok":false}');
+    }
+  };
+  var STYLES = [["night", "\u0644\u064A\u0644\u064A"], ["gold", "\u0630\u0647\u0628\u064A"], ["pearl", "\u0644\u0624\u0644\u0624\u064A"], ["emerald", "\u0632\u0645\u0631\u062F\u064A"]];
+  var BAR_FONTS = [
+    ["cairo", "\u0627\u0644\u0642\u0627\u0647\u0631\u0629", "'DzCairo', sans-serif"],
+    ["tajawal", "\u062A\u062C\u0648\u0627\u0644", "'DzTajawal', sans-serif"],
+    ["amiri", "\u0623\u0645\u064A\u0631\u064A", "'DzAmiri', serif"],
+    ["naskh", "\u0646\u0633\u062E", "'DzNaskh', serif"],
+    ["schehe", "\u0634\u0647\u0631\u0632\u0627\u062F", "'DzScheherazade', serif"],
+    ["kufi", "\u0643\u0648\u0641\u064A", "'DzKufi', sans-serif"],
+    ["reem", "\u0631\u064A\u0645 \u0643\u0648\u0641\u064A", "'DzReem', sans-serif"]
+  ];
+  var COLORS = [["auto", "\u062A\u0644\u0642\u0627\u0626\u064A"], ["#ffffff", "\u0623\u0628\u064A\u0636"], ["#1a1a1a", "\u0623\u0633\u0648\u062F"], ["#f5c86b", "\u0630\u0647\u0628\u064A"], ["#7ef0c8", "\u0632\u0645\u0631\u062F\u064A"], ["#8ecbff", "\u0633\u0645\u0627\u0648\u064A"], ["#ffb3c7", "\u0648\u0631\u062F\u064A"]];
+  var CFG0 = {
+    pins: SINGLES.map((i) => i.id),
+    mode: "rotate",
+    rotateMin: 1,
+    rotateSec: 60,
+    tickSpeed: 5,
+    style: "night",
+    font: "cairo",
+    color: "auto",
+    orient: "h",
+    opacity: 100,
+    glass: 35,
+    blur: true,
+    own: [],
+    w: 640,
+    h: 64,
+    topmost: true,
+    pos: "tc",
+    x: 0,
+    y: 0
+  };
+  var IKHLAS_FULL = `${BASMALA} ${IKHLAS_TEXT.replace(/\s*\(\d+\)\s*/g, " \u06DD ").trim()}`;
+  var FULL = { k0: IKHLAS_FULL, i3: SAYYID_TEXT };
+  var clamp2 = (n, a, b) => Math.min(b, Math.max(a, n));
+  var screenXY = (cfg) => {
+    const sc2 = area();
+    const sw2 = sc2.availWidth, sh = sc2.availHeight, ox2 = sc2.availLeft, oy = sc2.availTop, m = 2;
+    const xs = { l: ox2 + m, c: ox2 + Math.round((sw2 - cfg.w) / 2), r: ox2 + sw2 - cfg.w - m };
+    const ys = { t: oy + m, m: oy + Math.round((sh - cfg.h) / 2), b: oy + sh - cfg.h - m };
+    if (cfg.pos === "free") return { x: cfg.x, y: cfg.y };
+    return { x: xs[cfg.pos[1]] ?? xs.c, y: ys[cfg.pos[0]] ?? ys.t };
+  };
+  var clampWin = (x, y, w, h) => {
+    const sc2 = area();
+    const sw2 = sc2.availWidth, sh = sc2.availHeight, ox2 = sc2.availLeft, oy = sc2.availTop;
+    return { x: Math.round(clamp2(x, ox2, Math.max(ox2, ox2 + sw2 - w))), y: Math.round(clamp2(y, oy, Math.max(oy, oy + sh - h))) };
+  };
+  var SET_H = 560;
+  var SET_W = 430;
+  var CTL_H = 0;
+  var CTL_ON = false;
+  var ext = (st4) => st4 || CTL_ON ? CTL_H : 0;
+  var winDims = (o, w, h, st4) => o === "v" ? st4 ? { w: w + SET_W, h: Math.max(h + ext(st4), SET_H) } : { w, h: h + ext(st4) } : { w, h: h + ext(st4) + (st4 ? SET_H : 0) };
+  var rowDims = (o, W, H6, st4) => o === "v" ? st4 ? { w: W - SET_W, h: H6 - ext(st4) } : { w: W, h: H6 - ext(st4) } : { w: W, h: H6 - ext(st4) - (st4 ? SET_H : 0) };
+  function BarPage({ cuList, onExit }) {
+    const [cfg0, setCfg, sv] = useLocalState("bar.v1", CFG0);
+    const cfg = { ...CFG0, ...cfg0 || {} };
+    if (!["night", "gold", "pearl", "emerald"].includes(cfg.style)) cfg.style = "night";
+    cfg.opacity = 100;
+    cfg.blur = false;
+    if (cfg0 && cfg0.rotateSec === void 0 && cfg0.rotateMin) cfg.rotateSec = Math.round(cfg0.rotateMin * 60);
+    const [live, setLive] = (0, import_react4.useState)({});
+    const tmr = (0, import_react4.useRef)({});
+    const throttled = (k, fn, ms2 = 150) => {
+      const e6 = tmr.current[k] || (tmr.current[k] = { t: null, last: 0 });
+      const now = Date.now();
+      if (e6.t) clearTimeout(e6.t);
+      const wait = Math.max(0, e6.last + ms2 - now);
+      e6.t = setTimeout(() => {
+        e6.t = null;
+        e6.last = Date.now();
+        fn();
+      }, wait);
+    };
+    const save2 = (c6) => {
+      if (sv.ready) setCfg({ ...cfg, ...c6 });
+    };
+    const [settings, setSettings] = (0, import_react4.useState)(false);
+    const [idx, setIdx] = (0, import_react4.useState)(0);
+    const [lum, setLum] = (0, import_react4.useState)({ ring: 255, inside: -1 });
+    const [draft, setDraft] = (0, import_react4.useState)("");
+    const posRef = (0, import_react4.useRef)(screenXY(cfg));
+    const dragRef = (0, import_react4.useRef)(null);
+    const allItems = (0, import_react4.useMemo)(() => [
+      ...SINGLES,
+      ...ISTIGHFAR,
+      ...SALAWAT,
+      IKHLAS,
+      ...BASES.flatMap((b) => variants(b)),
+      ...cuList.map((c6) => ({ id: c6.id, text: c6.title })),
+      ...cfg.own || []
+    ], [cuList, cfg.own]);
+    const items = (0, import_react4.useMemo)(() => {
+      const picked = cfg.pins.map((id2) => ({ id: id2, text: FULL[id2] || cuList.find((c6) => c6.id === id2)?.text || (cfg.own || []).find((o) => o.id === id2)?.text || TEXT[id2] || allItems.find((i) => i.id === id2)?.text || "" })).filter((i) => i.text);
+      const canon = new Map(allItems.map((it2, k) => [it2.id, k]));
+      const base2 = Math.max(0, ...[...canon.values()]);
+      const rank = (id2) => cuList.some((c6) => c6.id === id2) || (cfg.own || []).some((o) => o.id === id2) ? base2 + 1 : canon.get(id2) ?? base2 + 1;
+      const sorted = picked.map((p, k) => ({ p, k })).sort((a, b) => rank(a.p.id) - rank(b.p.id) || a.k - b.k).map((x) => x.p);
+      return sorted.length ? sorted : SINGLES;
+    }, [cfg.pins, cfg.own, allItems, cuList]);
+    const pinsKey = items.map((i) => i.id).join(",");
+    (0, import_react4.useEffect)(() => {
+      const g = screenXY(cfg.tcDefault ? cfg : { ...cfg, pos: "tc" });
+      posRef.current = g;
+      CTL_ON = false;
+      winRef.current = { w: cfg.w, h: cfg.h };
+      call("enter", { light: true, x: g.x, y: g.y, w: cfg.w, h: cfg.h, top: cfg.topmost, opacity: 100, v: 0, on: false });
+      document.body.classList.add("dzb-on");
+      return () => {
+        document.body.classList.remove("dzb-on");
+      };
+    }, []);
+    (0, import_react4.useEffect)(() => {
+      if (cfg.mode !== "rotate") return;
+      const t = setInterval(() => setIdx((i) => i + 1), clamp2(cfg.rotateSec || 60, 1, 3600) * 1e3);
+      return () => clearInterval(t);
+    }, [cfg.mode, cfg.rotateSec, pinsKey]);
+    (0, import_react4.useEffect)(() => {
+      setIdx(0);
+    }, [pinsKey]);
+    (0, import_react4.useEffect)(() => {
+      if (cfg.color !== "auto") return;
+      let stop2 = false;
+      const probe = () => call("sampleBehind", {}).then((r) => {
+        if (stop2) return;
+        try {
+          const o = JSON.parse(r);
+          if (typeof o.lum === "number") setLum({ ring: o.lum, inside: typeof o.in === "number" ? o.in : -1 });
+        } catch {
+        }
+      });
+      probe();
+      const t = setInterval(probe, 2e3);
+      return () => {
+        stop2 = true;
+        clearInterval(t);
+      };
+    }, [cfg.color, cfg.pos, cfg.w, cfg.h, cfg.x, cfg.y]);
+    const OPAQUE = { night: [20, 25, 41], gold: [86, 60, 14], pearl: [249, 251, 254], emerald: [8, 68, 55] };
+    const opq = true ? OPAQUE[cfg.style] : void 0;
+    (0, import_react4.useEffect)(() => {
+      call("bg", opq ? { a: 255, r: opq[0], g: opq[1], bl: opq[2] } : { a: 0, r: 0, g: 0, bl: 0 });
+    }, [cfg.style, !!opq]);
+    const ctlTop = (cfg.pos || "")[0] === "b";
+    const [ctlHover, setCtlHover] = (0, import_react4.useState)(false);
+    const ctlTimer = (0, import_react4.useRef)(null);
+    const ctlOn = ctlHover || settings;
+    const ctlEnter = () => {
+      if (ctlTimer.current) clearTimeout(ctlTimer.current);
+      ctlTimer.current = null;
+      setCtlHover(true);
+    };
+    const ctlLeave = () => {
+      if (ctlTimer.current) clearTimeout(ctlTimer.current);
+      ctlTimer.current = setTimeout(() => setCtlHover(false), 700);
+    };
+    const ctlClick = () => {
+      if (!dragRef.current) ctlEnter();
+    };
+    (0, import_react4.useEffect)(() => {
+      call("ctl", { on: ctlHover && !settings, top: ctlTop, n: settings ? 1 : 0, r: opq ? opq[0] : 20, g: opq ? opq[1] : 25, bl: opq ? opq[2] : 41, light: cfg.style === "pearl" });
+    }, [ctlHover, settings, cfg.style]);
+    window.__dzbSettings = () => openSettings(!settings);
+    (0, import_react4.useEffect)(() => {
+      if (sv.ready && !cfg.tcDefault) {
+        const g = screenXY({ ...cfg, pos: "tc" });
+        save2({ pos: "tc", x: g.x, y: g.y, tcDefault: true });
+      }
+    }, [sv.ready]);
+    const lastRect = (0, import_react4.useRef)(null);
+    const edgeRef = (0, import_react4.useRef)(null);
+    const dimsRef = (0, import_react4.useRef)({ w: cfg.w, h: cfg.h, st: false });
+    dimsRef.current = { w: live.w ?? cfg.w, h: live.h ?? cfg.h, st: settings };
+    const MINW = 240, MINH = 44;
+    const edgeDown = (e6, edge) => {
+      e6.stopPropagation();
+      const d = dimsRef.current;
+      edgeRef.current = { e: edge, sx: e6.screenX, sy: e6.screenY, x: posRef.current.x, y: posRef.current.y, ...winDims(cfg.orient, d.w, d.h, d.st) };
+      try {
+        e6.currentTarget.setPointerCapture(e6.pointerId);
+      } catch {
+      }
+    };
+    const edgeMove = (e6) => {
+      const g = edgeRef.current;
+      if (!g) return;
+      const dx2 = e6.screenX - g.sx, dy = e6.screenY - g.sy;
+      let { x, y, w, h } = g;
+      const pp2 = cfg.pos, aH = pp2 === "free" || !pp2 || pp2[1] === "c", aV = pp2 !== "free" && !!pp2 && pp2[0] === "m";
+      if (g.e.includes("r")) w = g.w + (aH ? 2 * dx2 : dx2);
+      if (g.e.includes("l")) {
+        w = g.w - (aH ? 2 * dx2 : dx2);
+        x = aH ? g.x + dx2 : g.x + dx2;
+      }
+      if (g.e.includes("b")) h = g.h + (aV ? 2 * dy : dy);
+      if (g.e.includes("t")) {
+        h = g.h - (aV ? 2 * dy : dy);
+        y = g.y + dy;
+      }
+      if (aH && (g.e.includes("r") || g.e.includes("l"))) x = Math.round(g.x + (g.w - w) / 2);
+      if (aV && (g.e.includes("t") || g.e.includes("b"))) y = Math.round(g.y + (g.h - h) / 2);
+      const st0 = dimsRef.current.st;
+      const minW = (cfg.orient === "v" ? 80 : MINW) + (cfg.orient === "v" && st0 ? SET_W : 0);
+      const minH = cfg.orient === "v" ? st0 ? SET_H : 160 + ext(st0) : MINH + ext(st0) + (st0 ? SET_H : 0);
+      if (w < minW) {
+        if (aH && (g.e.includes("r") || g.e.includes("l"))) x = Math.round(g.x + (g.w - minW) / 2);
+        else if (g.e.includes("l")) x -= minW - w;
+        w = minW;
+      }
+      if (h < minH) {
+        if (aV && (g.e.includes("t") || g.e.includes("b"))) y = Math.round(g.y + (g.h - minH) / 2);
+        else if (g.e.includes("t")) y -= minH - h;
+        h = minH;
+      }
+      w = Math.round(w);
+      h = Math.round(h);
+      x = Math.round(x);
+      y = Math.round(y);
+      posRef.current = { x, y };
+      lastRect.current = { x, y, w, h };
+      {
+        const rd2 = rowDims(cfg.orient, w, h, dimsRef.current.st);
+        setLive((l) => ({ ...l, w: rd2.w, h: rd2.h }));
+      }
+      throttled("rect", () => call("rect", { x, y, w, h }), 50);
+    };
+    const edgeUp = () => {
+      const g = edgeRef.current;
+      if (!g) return;
+      edgeRef.current = null;
+      const r = lastRect.current;
+      lastRect.current = null;
+      if (!r) return;
+      const st4 = dimsRef.current.st;
+      const rd2 = rowDims(cfg.orient, r.w, r.h, st4);
+      const pp2 = cfg.pos, hE = g.e.includes("l") || g.e.includes("r"), vE2 = g.e.includes("t") || g.e.includes("b");
+      const okH = !hE || pp2 === "free" || pp2[1] === "c" || pp2[1] === "l" && g.e.includes("r") || pp2[1] === "r" && g.e.includes("l");
+      const okV = !vE2 || pp2[0] === "m" || pp2[0] === "t" && g.e.includes("b") || pp2[0] === "b" && g.e.includes("t");
+      winRef.current = { w: r.w, h: r.h };
+      if (okH && okV) save2({ w: rd2.w, h: rd2.h, x: r.x, y: r.y });
+      else save2({ w: rd2.w, h: rd2.h, pos: "free", x: r.x, y: r.y });
+      call("rect", r);
+      setLive((l) => ({ ...l, w: void 0, h: void 0 }));
+    };
+    const move = (x, y) => {
+      posRef.current = { x, y };
+      call("move", { x, y });
+    };
+    const winRef = (0, import_react4.useRef)(null);
+    const resize = (w, h, st4 = settings) => {
+      const d = winDims(cfg.orient, w, h, st4);
+      const o = winRef.current || d;
+      winRef.current = d;
+      const p = cfg.pos;
+      let { x, y } = posRef.current;
+      if (!p || p === "free" || p.length < 2) {
+        x = Math.round(x + (o.w - d.w) / 2);
+        ({ x, y } = clampWin(x, y, d.w, d.h));
+        posRef.current = { x, y };
+        call("rect", { x, y, w: d.w, h: d.h });
+        return;
+      }
+      if (p[1] === "c") x = Math.round(x + (o.w - d.w) / 2);
+      else if (p[1] === "r") x = x + (o.w - d.w);
+      if (p[0] === "m") y = Math.round(y + (o.h - d.h) / 2);
+      else if (p[0] === "b") y = y + (o.h - d.h);
+      if (st4 && !(p && p !== "free")) {
+      }
+      ({ x, y } = clampWin(x, y, d.w, d.h));
+      posRef.current = { x, y };
+      call("rect", { x, y, w: d.w, h: d.h });
+    };
+    const onPointerDown = (e6) => {
+      if (e6.target.closest("button,input,select,a")) return;
+      dragRef.current = { sx: e6.screenX, sy: e6.screenY, bx: posRef.current.x, by: posRef.current.y };
+      try {
+        e6.currentTarget.setPointerCapture(e6.pointerId);
+      } catch {
+      }
+    };
+    const onPointerMove = (e6) => {
+      const d = dragRef.current;
+      if (!d) return;
+      move(Math.round(d.bx + e6.screenX - d.sx), Math.round(d.by + e6.screenY - d.sy));
+    };
+    const onPointerUp = () => {
+      if (!dragRef.current) return;
+      dragRef.current = null;
+      save2({ pos: "free", x: posRef.current.x, y: posRef.current.y });
+    };
+    const openSettings = (open) => {
+      setSettings(open);
+      CTL_ON = ctlHover;
+      resize(cfg.w, cfg.h, open);
+    };
+    const exitBar = () => {
+      call("close", {});
+      onExit();
+    };
+    const applyPos = (p) => {
+      const d = winDims(cfg.orient, cfg.w, cfg.h, settings);
+      const g02 = screenXY({ ...cfg, pos: p, w: d.w, h: d.h });
+      const g = clampWin(g02.x, g02.y, d.w, d.h);
+      posRef.current = g;
+      save2({ pos: p, x: g.x, y: g.y });
+      move(g.x, g.y);
+    };
+    const setOrient = (o) => {
+      if (o === cfg.orient) return;
+      const nw2 = o === "v" ? 150 : 640, nh = o === "v" ? 420 : 64;
+      const p = !cfg.pos || cfg.pos === "free" ? "tc" : cfg.pos;
+      const g = screenXY({ ...cfg, orient: o, w: nw2, h: nh, pos: p });
+      const d = winDims(o, nw2, nh, settings);
+      posRef.current = g;
+      winRef.current = d;
+      call("rect", { x: g.x, y: g.y, w: d.w, h: d.h });
+      setTimeout(() => save2({ orient: o, w: nw2, h: nh, pos: p, x: g.x, y: g.y }), 30);
+    };
+    const commitSize = () => {
+      if (live.w === void 0 && live.h === void 0) return;
+      const w = live.w ?? cfg.w, h = live.h ?? cfg.h;
+      save2({ w, h });
+      resize(w, h);
+      setLive((l) => ({ ...l, w: void 0, h: void 0 }));
+    };
+    const commitGlass = () => {
+      if (live.g === void 0) return;
+      const v = live.g;
+      save2({ glass: v });
+      setLive((l) => ({ ...l, g: void 0 }));
+    };
+    const commitFs = () => {
+      if (live.f === void 0) return;
+      const v = live.f;
+      save2({ fs: v });
+      setLive((l) => ({ ...l, f: void 0 }));
+    };
+    const commitOp = () => {
+      if (live.o === void 0) return;
+      const v = live.o;
+      save2({ opacity: v });
+      setLive((l) => ({ ...l, o: void 0 }));
+    };
+    const applySize = (w, h) => {
+      save2({ w, h });
+      resize(w, h);
+    };
+    const addOwn = () => {
+      const lines = draft.split("\n").map((x) => x.trim()).filter(Boolean);
+      if (!lines.length) return;
+      const base2 = Date.now();
+      const add = lines.map((text, k) => ({ id: `bo${base2}_${k}`, text }));
+      save2({ own: [...cfg.own || [], ...add], pins: [...cfg.pins, ...add.map((a) => a.id)] });
+      setDraft("");
+    };
+    const delOwn = (id2) => save2({ own: (cfg.own || []).filter((o) => o.id !== id2), pins: cfg.pins.filter((p) => p !== id2) });
+    const togglePin = (id2) => {
+      const has = cfg.pins.includes(id2);
+      save2({ pins: has ? cfg.pins.filter((p) => p !== id2) : [...cfg.pins, id2] });
+    };
+    const pinGroups = [
+      ["\u0623\u0630\u0643\u0627\u0631\u064A", SINGLES],
+      ["\u0627\u0644\u0627\u0633\u062A\u063A\u0641\u0627\u0631", ISTIGHFAR],
+      ["\u0627\u0644\u0635\u0644\u0627\u0629 \u0639\u0644\u0649 \u0627\u0644\u0646\u0628\u064A \uFDFA", SALAWAT],
+      ["\u0633\u0648\u0631\u0629 \u0627\u0644\u0625\u062E\u0644\u0627\u0635", [IKHLAS]],
+      ...BASES.map((b) => [`\u0627\u0644\u0630\u0643\u0631 \u0627\u0644\u0645\u0636\u0627\u0639\u0641: ${b.text}`, variants(b)]),
+      ["\u0625\u0636\u0627\u0641\u0627\u062A\u064A", cuList.map((c6) => ({ id: c6.id, text: c6.title }))],
+      ["\u0623\u0630\u0643\u0627\u0631\u064A \u0627\u0644\u0645\u0636\u0627\u0641\u0629 \u0647\u0646\u0627", (cfg.own || []).map((o) => ({ id: o.id, text: o.text }))]
+    ];
+    const cur = items[(idx % items.length + items.length) % items.length];
+    const fontStack = (BAR_FONTS.find((f) => f[0] === cfg.font) || BAR_FONTS[0])[2];
+    const ringLum = lum.ring >= 0 ? lum.ring : 255;
+    const lightRef = (0, import_react4.useRef)(true);
+    if (ringLum >= 150) lightRef.current = true;
+    else if (ringLum < 120) lightRef.current = false;
+    const lightBg = cfg.style === "pearl";
+    const gl2 = false;
+    const blurOn = false;
+    (0, import_react4.useEffect)(() => {
+      call("acr", { on: false });
+    }, []);
+    const fsPct = (live.f ?? cfg.fs ?? 100) / 100;
+    const barSc = cfg.orient === "v" ? 1 : Math.max(0.8, Math.min((live.h ?? cfg.h) / 64, (live.w ?? cfg.w) / 640));
+    const sc2 = barSc * fsPct;
+    const autoColor = lightBg ? "#14202e" : "#ffffff";
+    const fg = cfg.color === "auto" ? autoColor : cfg.color;
+    const hx2 = /^#([0-9a-f]{6})$/i.exec(fg);
+    const fgLum = hx2 ? (parseInt(hx2[1].slice(0, 2), 16) * 299 + parseInt(hx2[1].slice(2, 4), 16) * 587 + parseInt(hx2[1].slice(4, 6), 16) * 114) / 1e3 : 255;
+    const halo = fgLum > 150 ? "rgba(0,0,0,.6)" : "rgba(255,255,255,.7)";
+    const tickSecs = Math.max(6, items.length * 7 * 5 / clamp2(cfg.tickSpeed || 5, 1, 10));
+    return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: `dzb dzb-${cfg.style} ${opq ? "dzb-opaque" : ""} ${blurOn ? "dzb-blur" : ""} ${cfg.orient === "v" ? "dzb-v" : ""} ${cfg.orient === "v" && settings ? "dzb-withset" : ""} ${cfg.orient !== "v" && settings && cfg.pos && cfg.pos[0] === "b" ? "dzb-setabove" : ""}`, style: { ["--dzb-sc"]: String(sc2), ["--dzb-fg"]: fg, ["--dzb-halo"]: halo, ["--dzb-oa"]: String(gl2 ? (live.g ?? cfg.glass) <= 0 ? 0 : 0.2 + 0.8 * (live.g ?? cfg.glass) / 100 : (live.o ?? cfg.opacity) / 100), ["--dzb-rw"]: `${live.w ?? cfg.w}px`, ["--dzb-rh"]: `${live.h ?? cfg.h}px`, ["--dzb-font"]: fontStack }, children: [
+      ["t", "b", "l", "r", "tl", "tr", "bl", "br"].map((ed2) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: `dzb-edge dzb-e-${ed2}`, onPointerDown: (e6) => edgeDown(e6, ed2), onPointerMove: edgeMove, onPointerUp: edgeUp, onPointerCancel: edgeUp }, ed2)),
+      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: `dzb-col ${ctlTop ? "dzb-ctltop" : ""}`, onPointerEnter: ctlEnter, onPointerLeave: ctlLeave, children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "dzb-row", onClick: ctlClick, onPointerDown, onPointerMove, onPointerUp, children: cfg.mode === "rotate" ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: "dzb-nav", "aria-label": "\u0627\u0644\u0633\u0627\u0628\u0642", onClick: () => setIdx((i) => i - 1), children: "\u2039" }),
+        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "dzb-text dzb-fade", title: cur.text, style: { fontSize: `calc(${cur.text.length <= 30 ? 24 : cur.text.length <= 70 ? 22 : 18}px * var(--dzb-sc, 1))`, whiteSpace: cur.text.length > 30 ? "normal" : void 0, lineHeight: 1.35, display: "flex", alignItems: "center", justifyContent: "center" }, children: cur.text }, cur.id + idx),
+        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: "dzb-nav", "aria-label": "\u0627\u0644\u062A\u0627\u0644\u064A", onClick: () => setIdx((i) => i + 1), children: "\u203A" })
+      ] }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "dzb-ticker", dir: "ltr", children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "dzb-tickstrip", style: { animationDuration: `${tickSecs}s` }, children: (cfg.orient === "v" ? [...items, ...items] : [...items, ...items].reverse()).map((it2, k) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { className: "dzb-tickitem", dir: "rtl", children: [
+        it2.text,
+        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("i", { className: "dzb-dot", children: "\u2022" })
+      ] }, k)) }) }) }) }),
+      settings && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dzb-set", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dzb-sec", style: { flexDirection: "row", gap: 8 }, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: "dzb-chip is-on", onClick: () => openSettings(false), children: "\u2699 \u0625\u062E\u0641\u0627\u0621 \u0627\u0644\u0625\u0639\u062F\u0627\u062F\u0627\u062A" }),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: "dzb-chip", onClick: exitBar, children: "\u2715 \u0625\u062E\u0641\u0627\u0621 \u0627\u0644\u0634\u0631\u064A\u0637" })
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dzb-sec", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "dzb-lb", children: "\u0648\u0636\u0639 \u0627\u0644\u0639\u0631\u0636" }),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: cfg.mode === "rotate" ? "dzb-chip is-on" : "dzb-chip", onClick: () => save2({ mode: "rotate" }), children: "\u062A\u0646\u0627\u0648\u0628 \u062A\u0644\u0642\u0627\u0626\u064A" }),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: cfg.mode === "ticker" ? "dzb-chip is-on" : "dzb-chip", onClick: () => save2({ mode: "ticker" }), children: "\u0634\u0631\u064A\u0637 \u0645\u062A\u062D\u0631\u0643" }),
+          cfg.mode === "rotate" && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("label", { className: "dzb-num", children: [
+            "\u0643\u0644 ",
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("input", { type: "number", min: 1, max: 3600, value: cfg.rotateSec, onChange: (e6) => save2({ rotateSec: clamp2(Math.round(Number(e6.target.value)) || 1, 1, 3600) }) }),
+            " \u062B\u0627\u0646\u064A\u0629"
+          ] }),
+          cfg.mode === "ticker" && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("label", { className: "dzb-rng", children: [
+            "\u0627\u0644\u0633\u0631\u0639\u0629 ",
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("input", { type: "range", min: 1, max: 10, step: 1, value: cfg.tickSpeed, onChange: (e6) => save2({ tickSpeed: Number(e6.target.value) }) }),
+            " ",
+            cfg.tickSpeed
+          ] })
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dzb-sec", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "dzb-lb", children: "\u0627\u062A\u062C\u0627\u0647 \u0627\u0644\u0634\u0631\u064A\u0637" }),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: cfg.orient !== "v" ? "dzb-chip is-on" : "dzb-chip", onClick: () => setOrient("h"), children: "\u0623\u0641\u0642\u064A" }),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: cfg.orient === "v" ? "dzb-chip is-on" : "dzb-chip", onClick: () => setOrient("v"), children: "\u0631\u0623\u0633\u064A" })
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dzb-sec", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "dzb-lb", children: "\u0627\u0644\u0646\u0645\u0637" }),
+          STYLES.map((s) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: `dzb-swatch dzb-sw-${s[0]} ${cfg.style === s[0] ? "is-on" : ""}`, title: s[1], onClick: () => save2({ style: s[0] }), children: s[1] }, s[0]))
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dzb-sec", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "dzb-lb", children: "\u0627\u0644\u062E\u0637" }),
+          BAR_FONTS.map((f) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", style: { fontFamily: f[2] }, className: cfg.font === f[0] ? "dzb-chip is-on" : "dzb-chip", onClick: () => save2({ font: f[0] }), children: f[1] }, f[0]))
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dzb-sec", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "dzb-lb", children: "\u0644\u0648\u0646 \u0627\u0644\u062E\u0637" }),
+          COLORS.map((c6) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", { type: "button", className: cfg.color === c6[0] ? "dzb-chip is-on" : "dzb-chip", onClick: () => save2({ color: c6[0] }), children: [
+            c6[0] !== "auto" && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("i", { className: "dzb-cdot", style: { background: c6[0] } }),
+            c6[1]
+          ] }, c6[0]))
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dzb-sec", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "dzb-lb", children: "\u0627\u0644\u0645\u0643\u0627\u0646" }),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "dzb-grid", children: [["t", "\u0623\u0639\u0644\u0649"], ["m", "\u0627\u0644\u0648\u0633\u0637"], ["b", "\u0623\u0633\u0641\u0644"]].map((v) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "dzb-groupline", children: [["r", "\u064A\u0645\u064A\u0646"], ["c", "\u0648\u0633\u0637"], ["l", "\u064A\u0633\u0627\u0631"]].map((h) => {
+            const p = v[0] + h[0];
+            return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: cfg.pos === p ? "dzb-chip is-on" : "dzb-chip", onClick: () => applyPos(p), children: `${v[1]} ${h[1]}` }, p);
+          }) }, v[0])) }),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "dzb-hint", children: "\u0623\u0648 \u0627\u0633\u062D\u0628 \u0627\u0644\u0634\u0631\u064A\u0637 \u0644\u0623\u064A \u0645\u0643\u0627\u0646 \u0628\u062D\u0631\u064A\u0629" })
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dzb-sec", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "dzb-lb", children: "\u0627\u0644\u062D\u062C\u0645" }),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("label", { className: "dzb-rng", children: [
+            "\u0627\u0644\u0639\u0631\u0636 ",
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("input", { type: "range", min: cfg.orient === "v" ? 80 : 300, max: cfg.orient === "v" ? 400 : 1e3, step: 10, value: live.w ?? cfg.w, onChange: (e6) => {
+              const v = Number(e6.target.value);
+              setLive((l) => ({ ...l, w: v }));
+              throttled("size", () => resize(v, live.h ?? cfg.h));
+            }, onPointerUp: commitSize, onKeyUp: commitSize, onBlur: commitSize })
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("label", { className: "dzb-rng", children: [
+            "\u062D\u062C\u0645 \u0627\u0644\u062E\u0637 ",
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("input", { type: "range", min: 60, max: 220, step: 5, value: live.f ?? cfg.fs ?? 100, onChange: (e6) => {
+              const v = Number(e6.target.value);
+              setLive((l) => ({ ...l, f: v }));
+            }, onPointerUp: commitFs, onKeyUp: commitFs, onBlur: commitFs }),
+            " ",
+            Math.round(live.f ?? cfg.fs ?? 100),
+            "\u066A"
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("label", { className: "dzb-rng", children: [
+            "\u0627\u0644\u0627\u0631\u062A\u0641\u0627\u0639 ",
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("input", { type: "range", min: cfg.orient === "v" ? 160 : 44, max: cfg.orient === "v" ? 900 : 120, step: 2, value: live.h ?? cfg.h, onChange: (e6) => {
+              const v = Number(e6.target.value);
+              setLive((l) => ({ ...l, h: v }));
+              throttled("size", () => resize(live.w ?? cfg.w, v));
+            }, onPointerUp: commitSize, onKeyUp: commitSize, onBlur: commitSize })
+          ] })
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "dzb-sec", children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: cfg.topmost ? "dzb-chip is-on" : "dzb-chip", onClick: () => {
+          const t = !cfg.topmost;
+          save2({ topmost: t });
+          call("topmost", { on: t });
+        }, children: "\u0645\u062B\u0628\u0651\u062A \u0641\u0648\u0642 \u0643\u0644 \u0627\u0644\u0646\u0648\u0627\u0641\u0630" }) }),
+        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dzb-sec", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "dzb-lb", children: "\u0623\u0636\u0641 \u0623\u0630\u0643\u0627\u0631\u0643 \u0644\u0644\u0634\u0631\u064A\u0637 (\u0643\u0644 \u0633\u0637\u0631 \u0630\u0643\u0631\u060C \u0648\u062A\u0642\u062F\u0631 \u062A\u0636\u064A\u0641 \u0639\u062F\u062F \u063A\u064A\u0631 \u0645\u062D\u062F\u0648\u062F)" }),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("textarea", { className: "dzb-ta", rows: 3, value: draft, onChange: (e6) => setDraft(e6.target.value), placeholder: "\u0627\u0643\u062A\u0628 \u0627\u0644\u0623\u0630\u0643\u0627\u0631 \u0647\u0646\u0627\u060C \u0643\u0644 \u0630\u0643\u0631 \u0641\u064A \u0633\u0637\u0631" }),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: "dzb-chip is-on", onClick: addOwn, children: "\u0625\u0636\u0627\u0641\u0629" }),
+          (cfg.own || []).map((o) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { className: "dzb-chip is-on", children: [
+            o.text,
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: "dzb-x", "aria-label": "\u062D\u0630\u0641", onClick: () => delOwn(o.id), children: "\xD7" })
+          ] }, o.id))
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dzb-sec dzb-pins", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "dzb-lb", children: "\u0627\u0644\u0623\u0630\u0643\u0627\u0631 \u0627\u0644\u0638\u0627\u0647\u0631\u0629 \u0641\u064A \u0627\u0644\u0634\u0631\u064A\u0637" }),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { className: "dzb-pinbar", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: "dzb-chip is-on", onClick: () => save2({ pins: Array.from(new Set(pinGroups.flatMap((g) => g[1].map((x) => x.id)))) }), children: "\u062A\u062D\u062F\u064A\u062F \u0627\u0644\u0643\u0644" }),
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: "dzb-chip", onClick: () => save2({ pins: [] }), children: "\u0625\u0644\u063A\u0627\u0621 \u062A\u062D\u062F\u064A\u062F \u0627\u0644\u0643\u0644" }),
+            /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { className: "dzb-hint", children: [
+              "\u0627\u0644\u0645\u062D\u062F\u062F: ",
+              cfg.pins.length,
+              cfg.pins.length === 0 ? " (\u0644\u0648 \u0645\u0641\u064A\u0634 \u0627\u062E\u062A\u064A\u0627\u0631 \u0628\u064A\u0639\u0631\u0636 \u0623\u0630\u0643\u0627\u0631\u064A)" : ""
+            ] })
+          ] }),
+          pinGroups.map(([lb2, list]) => list.length === 0 ? null : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { className: "dzb-pingroup", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("em", { children: [
+              lb2,
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: "dzb-lnk", onClick: () => save2({ pins: Array.from(/* @__PURE__ */ new Set([...cfg.pins, ...list.map((x) => x.id)])) }), children: "\u062A\u062D\u062F\u064A\u062F" }),
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: "dzb-lnk", onClick: () => save2({ pins: cfg.pins.filter((p) => !list.some((x) => x.id === p)) }), children: "\u0625\u0644\u063A\u0627\u0621" })
+            ] }),
+            list.map((it2) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: cfg.pins.includes(it2.id) ? "dzb-chip is-on" : "dzb-chip", onClick: () => togglePin(it2.id), children: it2.text }, it2.id))
+          ] }, lb2))
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "dzb-sec", children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: "dzb-wide", onClick: exitBar, children: "\u0625\u062E\u0641\u0627\u0621 \u0627\u0644\u0634\u0631\u064A\u0637" }) })
+      ] })
+    ] });
+  }
+  function WebBarHost({ onClose }) {
+    const [rect, setRect] = (0, import_react4.useState)(null);
+    const [ctl, setCtl] = (0, import_react4.useState)({ on: false, top: false, r: 20, g: 25, b: 41, light: false });
+    const frame = (0, import_react4.useRef)(null);
+    const keep = (0, import_react4.useRef)(false);
+    const rectRef = (0, import_react4.useRef)(null);
+    (0, import_react4.useEffect)(() => {
+      const w = window;
+      w.__dzbArea = () => ({ availWidth: window.innerWidth, availHeight: window.innerHeight, availLeft: 0, availTop: 0 });
+      w.__dzbWebBridge = (action, payload) => {
+        let r = {};
+        try {
+          r = JSON.parse(payload || "{}");
+        } catch {
+        }
+        const cur = rectRef.current || { x: 0, y: 0, w: 640, h: 64 };
+        const set4 = (n) => {
+          rectRef.current = n;
+          setRect(n);
+        };
+        if (action === "enter" || action === "rect") set4({ x: r.x, y: r.y, w: r.w, h: r.h });
+        else if (action === "move") set4({ ...cur, x: r.x, y: r.y });
+        else if (action === "resize") set4({ ...cur, w: r.w, h: r.h });
+        else if (action === "close") {
+          onClose();
+        } else if (action === "ctl") {
+          if (r.on) setCtl({ on: true, top: !!r.top, r: r.r ?? 20, g: r.g ?? 25, b: r.bl ?? 41, light: !!r.light });
+          else if (!keep.current) setCtl((c6) => ({ ...c6, on: false }));
+        } else if (action === "sampleBehind") return '{"lum":-1,"in":-1}';
+        return '{"ok":true}';
+      };
+      const onResize = () => {
+        const c6 = rectRef.current;
+        if (c6) {
+          const x = Math.min(Math.max(0, c6.x), Math.max(0, window.innerWidth - c6.w)), y = Math.min(Math.max(0, c6.y), Math.max(0, window.innerHeight - c6.h));
+          if (x !== c6.x || y !== c6.y) {
+            rectRef.current = { ...c6, x, y };
+            setRect(rectRef.current);
+          }
+        }
+      };
+      window.addEventListener("resize", onResize);
+      return () => {
+        window.removeEventListener("resize", onResize);
+        delete w.__dzbWebBridge;
+        delete w.__dzbArea;
+      };
+    }, []);
+    const src = location.pathname + "?bar=1";
+    const bg = `rgb(${ctl.r},${ctl.g},${ctl.b})`, fgc = ctl.light ? "#14202e" : "#fff";
+    const bs = { font: "700 14px system-ui,sans-serif", background: bg, color: fgc, border: "1px solid rgba(128,128,128,.35)", borderRadius: 10, padding: "6px 12px", cursor: "pointer", boxShadow: "0 4px 14px rgba(0,0,0,.3)" };
+    return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: { position: "fixed", zIndex: 2147483e3, left: rect ? rect.x : -9999, top: rect ? rect.y : -9999, width: rect ? rect.w : 640, height: rect ? rect.h : 64, borderRadius: 14, overflow: "hidden", boxShadow: "0 6px 24px rgba(0,0,0,.35)", visibility: rect ? "visible" : "hidden" }, children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("iframe", { ref: frame, src, title: "\u0634\u0631\u064A\u0637 \u0627\u0644\u0623\u0630\u0643\u0627\u0631", style: { border: 0, width: "100%", height: "100%", display: "block", background: "transparent" } }) }),
+      rect && ctl.on && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(
+        "div",
+        {
+          onPointerEnter: () => {
+            keep.current = true;
+          },
+          onPointerLeave: () => {
+            keep.current = false;
+            setTimeout(() => setCtl((c6) => ({ ...c6, on: false })), 900);
+          },
+          style: { position: "fixed", zIndex: 2147483001, left: rect.x + rect.w / 2 - 70, top: ctl.top ? Math.max(0, rect.y - 42) : Math.min(window.innerHeight - 40, rect.y + rect.h + 6), display: "flex", gap: 8, direction: "rtl" },
+          children: [
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", style: bs, onClick: () => {
+              try {
+                frame.current?.contentWindow?.__dzbSettings?.();
+              } catch {
+              }
+            }, children: "\u0625\u0639\u062F\u0627\u062F\u0627\u062A" }),
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", style: bs, onClick: () => onClose(), children: "\u0625\u062E\u0641\u0627\u0621" })
+          ]
+        }
+      )
+    ] });
+  }
+  var pipSupported = () => typeof window !== "undefined" && !!window.documentPictureInPicture;
+  async function openBarPip(onClosed) {
+    const dpip = window.documentPictureInPicture;
+    if (!dpip) return false;
+    let pw2;
+    try {
+      pw2 = await dpip.requestWindow({ width: 640, height: 64 });
+    } catch {
+      return false;
+    }
+    const d = pw2.document;
+    d.body.style.cssText = "margin:0;overflow:hidden;background:#000";
+    const f = d.createElement("iframe");
+    f.src = location.pathname + "?bar=1";
+    f.title = "\u0634\u0631\u064A\u0637 \u0627\u0644\u0623\u0630\u0643\u0627\u0631";
+    f.style.cssText = "border:0;width:100vw;height:100vh;display:block";
+    d.body.appendChild(f);
+    const box = d.createElement("div");
+    box.style.cssText = "position:fixed;left:0;right:0;bottom:6px;display:none;justify-content:center;gap:8px;direction:rtl;z-index:5";
+    d.body.appendChild(box);
+    let keep = false, hideT = null;
+    const mk = (label2, fn) => {
+      const b = d.createElement("button");
+      b.type = "button";
+      b.textContent = label2;
+      b.onclick = fn;
+      box.appendChild(b);
+      return b;
+    };
+    const styleBtn = (bg, fg) => {
+      box.querySelectorAll("button").forEach((b) => {
+        b.style.cssText = `font:700 14px system-ui,sans-serif;background:${bg};color:${fg};border:1px solid rgba(128,128,128,.4);border-radius:10px;padding:5px 12px;cursor:pointer;opacity:.95`;
+      });
+    };
+    mk("\u0625\u0639\u062F\u0627\u062F\u0627\u062A", () => {
+      try {
+        f.contentWindow?.__dzbSettings?.();
+      } catch {
+      }
+    });
+    mk("\u0625\u062E\u0641\u0627\u0621", () => {
+      try {
+        pw2.close();
+      } catch {
+      }
+    });
+    box.onpointerenter = () => {
+      keep = true;
+      if (hideT) clearTimeout(hideT);
+    };
+    box.onpointerleave = () => {
+      keep = false;
+      hideT = setTimeout(() => {
+        box.style.display = "none";
+      }, 900);
+    };
+    pw2.__dzbArea = () => ({ availWidth: pw2.innerWidth || 640, availHeight: pw2.innerHeight || 64, availLeft: 0, availTop: 0 });
+    const resizeTo = (w, h) => {
+      try {
+        pw2.resizeTo(Math.round(w + (pw2.outerWidth - pw2.innerWidth)), Math.round(h + (pw2.outerHeight - pw2.innerHeight)));
+      } catch {
+      }
+    };
+    pw2.__dzbWebBridge = (action, payload) => {
+      let r = {};
+      try {
+        r = JSON.parse(payload || "{}");
+      } catch {
+      }
+      if ((action === "enter" || action === "rect" || action === "resize") && r.w && r.h) resizeTo(r.w, r.h);
+      else if (action === "close") {
+        try {
+          pw2.close();
+        } catch {
+        }
+      } else if (action === "ctl") {
+        if (r.on) {
+          const bg = `rgb(${r.r ?? 20},${r.g ?? 25},${r.bl ?? 41})`;
+          styleBtn(bg, r.light ? "#14202e" : "#fff");
+          box.style.display = "flex";
+          if (hideT) clearTimeout(hideT);
+        } else if (!keep) box.style.display = "none";
+      } else if (action === "sampleBehind") return '{"lum":-1,"in":-1}';
+      return '{"ok":true}';
+    };
+    pw2.addEventListener("pagehide", () => onClosed());
+    return true;
+  }
+
+  // src/App.tsx
+  var import_jsx_runtime2 = __toESM(require_jsx_runtime());
   var RETAIN_DAYS = 14;
   var VIB = true;
   var buzz = (p) => {
@@ -16489,7 +17336,7 @@ Error generating stack: ` + i.message + `
   function useStore() {
     const [daily, setDaily, sd2] = useLocalState("dz.daily.v2", {});
     const [rest, setRest, sr] = useLocalState("dz.rest.v2", { m: {}, p: {} });
-    const latest = (0, import_react4.useRef)({ daily: null, rest: null });
+    const latest = (0, import_react5.useRef)({ daily: null, rest: null });
     const ready = sd2.ready && sr.ready;
     const message = sd2.message || sr.message || "";
     const apply = (changes, src) => {
@@ -16572,8 +17419,8 @@ Error generating stack: ` + i.message + `
     return best;
   };
   var sumPrefix = (c6, prefix) => Object.entries(c6).filter(([k]) => k.startsWith(prefix)).reduce((a, [, v]) => a + v, 0);
-  var GoalCtx = import_react4.default.createContext({});
-  var GoalInfoCtx = import_react4.default.createContext({ prog: () => 0, label: "\u0627\u0644\u064A\u0648\u0645" });
+  var GoalCtx = import_react5.default.createContext({});
+  var GoalInfoCtx = import_react5.default.createContext({ prog: () => 0, label: "\u0627\u0644\u064A\u0648\u0645" });
   var PERIODS = [["day", "\u064A\u0648\u0645\u064A"], ["week", "\u0623\u0633\u0628\u0648\u0639\u064A"], ["month", "\u0634\u0647\u0631\u064A"], ["manual", "\u064A\u062F\u0648\u064A"]];
   var periodKey = (per, now) => per === "week" ? keyOf(new Date(now.getFullYear(), now.getMonth(), now.getDate() - (now.getDay() + 1) % 7)) : per === "month" ? keyOf(now).slice(0, 7) : per === "manual" ? "m" : keyOf(now);
   function progressOf(store, per, base2, id2) {
@@ -16594,43 +17441,43 @@ Error generating stack: ` + i.message + `
     const b = base2?.[id2];
     return Math.max(0, sum - (b && b.pk === pk ? b.v : 0));
   }
-  var UiCtx = import_react4.default.createContext(null);
+  var UiCtx = import_react5.default.createContext(null);
   var mmss = (t) => `${pad(Math.floor(t / 60))}:${pad(t % 60)}`;
   function GoIcon({ pause: pause2 }) {
-    return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("svg", { viewBox: "0 0 24 24", width: "24", height: "24", "aria-hidden": "true", fill: "currentColor", children: pause2 ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("rect", { x: "6", y: "5", width: "4.2", height: "14", rx: "1.4" }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("rect", { x: "13.8", y: "5", width: "4.2", height: "14", rx: "1.4" })
-    ] }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("path", { d: "M8 5v14l11-7z" }) });
+    return /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("svg", { viewBox: "0 0 24 24", width: "24", height: "24", "aria-hidden": "true", fill: "currentColor", children: pause2 ? /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(import_jsx_runtime2.Fragment, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("rect", { x: "6", y: "5", width: "4.2", height: "14", rx: "1.4" }),
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("rect", { x: "13.8", y: "5", width: "4.2", height: "14", rx: "1.4" })
+    ] }) : /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("path", { d: "M8 5v14l11-7z" }) });
   }
   function Picker({ seq, off, setOff, cur }) {
     const ids = Array.from(new Set(seq.map((i) => i.id)));
-    return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dz-chips", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: "dz-chip", disabled: off.length === 0, onClick: () => setOff([]), children: "\u062A\u062D\u062F\u064A\u062F \u0627\u0644\u0643\u0644" }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: "dz-chip", disabled: off.length >= ids.length, onClick: () => setOff(ids), children: "\u0625\u0644\u063A\u0627\u0621 \u062A\u062D\u062F\u064A\u062F \u0627\u0644\u0643\u0644" })
+    return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(import_jsx_runtime2.Fragment, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-chips", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: "dz-chip", disabled: off.length === 0, onClick: () => setOff([]), children: "\u062A\u062D\u062F\u064A\u062F \u0627\u0644\u0643\u0644" }),
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: "dz-chip", disabled: off.length >= ids.length, onClick: () => setOff(ids), children: "\u0625\u0644\u063A\u0627\u0621 \u062A\u062D\u062F\u064A\u062F \u0627\u0644\u0643\u0644" })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("ol", { className: "dz-steplist dz-scroll", children: seq.map((it2, k) => {
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("ol", { className: "dz-steplist dz-scroll", children: seq.map((it2, k) => {
         const on = !off.includes(it2.id);
-        return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("label", { className: cur === it2.text ? "dz-chk is-now" : "dz-chk", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("input", { type: "checkbox", checked: on, onChange: () => setOff(on ? [...off, it2.id] : off.filter((x) => x !== it2.id)) }),
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "dz-stepnum", children: fmt(k + 1) }),
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "dz-steptext", children: sig(it2.text) })
+        return /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("li", { children: /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("label", { className: cur === it2.text ? "dz-chk is-now" : "dz-chk", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("input", { type: "checkbox", checked: on, onChange: () => setOff(on ? [...off, it2.id] : off.filter((x) => x !== it2.id)) }),
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "dz-stepnum", children: fmt(k + 1) }),
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "dz-steptext", children: sig(it2.text) })
         ] }) }, k + it2.id);
       }) })
     ] });
   }
   function ListenPanel({ seq: full, onClose, off: offP, setOff: setOffP }) {
-    const [offL, setOffL] = (0, import_react4.useState)([]);
-    const [pick, setPick] = (0, import_react4.useState)(false);
+    const [offL, setOffL] = (0, import_react5.useState)([]);
+    const [pick, setPick] = (0, import_react5.useState)(false);
     const off = offP ?? offL;
     const setOff = setOffP ?? setOffL;
     const seq = full.filter((i) => !off.includes(i.id));
     const none = seq.length === 0;
     const ps = usePlayer();
-    const uc2 = import_react4.default.useContext(UiCtx);
-    const [mk, setMk] = (0, import_react4.useState)("times");
-    const [rt, setRt] = (0, import_react4.useState)("1");
-    const [rm2, setRm] = (0, import_react4.useState)("10");
+    const uc2 = import_react5.default.useContext(UiCtx);
+    const [mk, setMk] = (0, import_react5.useState)("times");
+    const [rt, setRt] = (0, import_react5.useState)("1");
+    const [rm2, setRm] = (0, import_react5.useState)("10");
     const nT = Math.min(1e5, Math.max(1, Math.floor(Number(rt) || 0)));
     const nM = Math.min(1440, Math.max(1, Math.floor(Number(rm2) || 0)));
     const validT = Number(rt) >= 1, validM = Number(rm2) >= 1;
@@ -16638,8 +17485,8 @@ Error generating stack: ` + i.message + `
     const mode = mk === "times" ? { k: "times", label: "", times: nT } : mk === "mins" ? { k: "mins", label: "", mins: nM } : { k: "inf", label: "" };
     const key = full.map((i) => i.id).join("|");
     const mine = ps.id === key;
-    const first = import_react4.default.useRef(true);
-    (0, import_react4.useEffect)(() => {
+    const first = import_react5.default.useRef(true);
+    (0, import_react5.useEffect)(() => {
       if (first.current) {
         first.current = false;
         return;
@@ -16652,16 +17499,16 @@ Error generating stack: ` + i.message + `
     const setSpd = (v) => {
       if (uc2) uc2.update({ ...uc2.ui, spd: v });
     };
-    const [more, setMore] = (0, import_react4.useState)(false);
+    const [more, setMore] = (0, import_react5.useState)(false);
     const astat = useAmbStat();
-    const ambRef = import_react4.default.useRef(null);
-    (0, import_react4.useEffect)(() => {
+    const ambRef = import_react5.default.useRef(null);
+    (0, import_react5.useEffect)(() => {
       if (!onClose && takeFocus()) {
         setMore(true);
         setTimeout(() => ambRef.current?.scrollIntoView({ block: "center", behavior: "smooth" }), 200);
       }
     });
-    (0, import_react4.useEffect)(() => {
+    (0, import_react5.useEffect)(() => {
       setAmbPreview(more);
       return () => setAmbPreview(false);
     }, [more]);
@@ -16677,101 +17524,101 @@ Error generating stack: ` + i.message + `
     const multi = full.length > 1;
     const label2 = mk === "times" ? nT === 1 ? "\u0645\u0631\u0629" : `${fmt(nT)} \u0645\u0631\u0629` : mk === "mins" ? `${fmt(nM)} \u062F\u0642\u064A\u0642\u0629` : "\u0628\u0644\u0627 \u062A\u0648\u0642\u0641";
     const stat = mine ? (ps.times ? `\u0627\u0644\u0645\u0631\u0629 ${fmt(ps.n)} \u0645\u0646 ${fmt(ps.times)}` : ps.endAt ? `\u0627\u0644\u0645\u0631\u0629 ${fmt(ps.n)} \xB7 \u0628\u0627\u0642\u064A ${mmss(ps.left)}` : `\u0627\u0644\u0645\u0631\u0629 ${fmt(ps.n)}`) + (multi ? ` \xB7 \u0627\u0644\u0630\u0643\u0631 ${fmt(ps.idx + 1)} \u0645\u0646 ${fmt(ps.len)}` : "") : "";
-    return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dz-listen dz-mini", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dz-mini-bar", children: [
-        mine ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: "dz-mini-go", onClick: togglePause, "aria-label": ps.paused ? "\u0627\u0633\u062A\u0645\u0631\u0627\u0631" : "\u0625\u064A\u0642\u0627\u0641 \u0645\u0624\u0642\u062A", children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(GoIcon, { pause: !ps.paused }) }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: "dz-mini-go", disabled: none || bad, onClick: () => play(key, seq, mode), "aria-label": multi ? "\u0627\u0633\u062A\u0645\u0639 \u0644\u0644\u062F\u0648\u0631\u0629 \u0643\u0627\u0645\u0644\u0629" : "\u0627\u0633\u062A\u0645\u0639", children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(GoIcon, {}) }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dz-mini-info", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dz-mini-t", children: [
+    return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-listen dz-mini", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-mini-bar", children: [
+        mine ? /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: "dz-mini-go", onClick: togglePause, "aria-label": ps.paused ? "\u0627\u0633\u062A\u0645\u0631\u0627\u0631" : "\u0625\u064A\u0642\u0627\u0641 \u0645\u0624\u0642\u062A", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(GoIcon, { pause: !ps.paused }) }) : /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: "dz-mini-go", disabled: none || bad, onClick: () => play(key, seq, mode), "aria-label": multi ? "\u0627\u0633\u062A\u0645\u0639 \u0644\u0644\u062F\u0648\u0631\u0629 \u0643\u0627\u0645\u0644\u0629" : "\u0627\u0633\u062A\u0645\u0639", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(GoIcon, {}) }),
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-mini-info", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-mini-t", children: [
             mine ? "\u064A\u064F\u0633\u0645\u0639 \u0627\u0644\u0622\u0646" : multi ? "\u0627\u0633\u062A\u0645\u0639 \u0644\u0644\u062F\u0648\u0631\u0629 \u0643\u0627\u0645\u0644\u0629" : "\u0627\u0633\u062A\u0645\u0639",
             " \xB7 ",
             label2
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "dz-mini-s", children: mine ? (ps.paused ? "\u0645\u062A\u0648\u0642\u0641 \u0645\u0624\u0642\u062A\u064B\u0627 \xB7 " : "") + stat : `\u0627\u0644\u0635\u0648\u062A ${fmt(volPct)}%` })
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "dz-mini-s", children: mine ? (ps.paused ? "\u0645\u062A\u0648\u0642\u0641 \u0645\u0624\u0642\u062A\u064B\u0627 \xB7 " : "") + stat : `\u0627\u0644\u0635\u0648\u062A ${fmt(volPct)}%` })
         ] }),
-        onClose && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: "dz-mini-x", onClick: onClose, "aria-label": "\u0625\u063A\u0644\u0627\u0642", children: "\u2715" })
+        onClose && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: "dz-mini-x", onClick: onClose, "aria-label": "\u0625\u063A\u0644\u0627\u0642", children: "\u2715" })
       ] }),
-      mine && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dz-chips", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: "dz-chip", onClick: restart, children: "\u21BA \u0627\u0628\u062F\u0623 \u0645\u0646 \u0627\u0644\u0623\u0648\u0644" }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: "dz-chip", onClick: stop, children: "\u25A0 \u0625\u0646\u0647\u0627\u0621" })
+      mine && /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-chips", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: "dz-chip", onClick: restart, children: "\u21BA \u0627\u0628\u062F\u0623 \u0645\u0646 \u0627\u0644\u0623\u0648\u0644" }),
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: "dz-chip", onClick: stop, children: "\u25A0 \u0625\u0646\u0647\u0627\u0621" })
       ] }),
-      mine && ps.note && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "dz-status", children: ps.note }),
-      none && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "dz-status", children: "\u0627\u062E\u062A\u0631 \u0630\u0643\u0631\u064B\u0627 \u0648\u0627\u062D\u062F\u064B\u0627 \u0639\u0644\u0649 \u0627\u0644\u0623\u0642\u0644" }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dz-drawer", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dz-opts", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("label", { className: mk === "times" ? "dz-opt is-on" : "dz-opt", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "\u0643\u0645 \u0645\u0631\u0629 \u062A\u0631\u064A\u062F \u062A\u0634\u063A\u064A\u0644\u0647\u0627\u061F" }),
-            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("input", { type: "text", inputMode: "numeric", pattern: "[0-9]*", dir: "ltr", value: rt, placeholder: "\u0645\u062B\u0644\u0627\u064B 100", onFocus: () => setMk("times"), onChange: (e6) => {
+      mine && ps.note && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "dz-status", children: ps.note }),
+      none && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "dz-status", children: "\u0627\u062E\u062A\u0631 \u0630\u0643\u0631\u064B\u0627 \u0648\u0627\u062D\u062F\u064B\u0627 \u0639\u0644\u0649 \u0627\u0644\u0623\u0642\u0644" }),
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-drawer", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-opts", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("label", { className: mk === "times" ? "dz-opt is-on" : "dz-opt", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { children: "\u0643\u0645 \u0645\u0631\u0629 \u062A\u0631\u064A\u062F \u062A\u0634\u063A\u064A\u0644\u0647\u0627\u061F" }),
+            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("input", { type: "text", inputMode: "numeric", pattern: "[0-9]*", dir: "ltr", value: rt, placeholder: "\u0645\u062B\u0644\u0627\u064B 100", onFocus: () => setMk("times"), onChange: (e6) => {
               setRt(e6.target.value.replace(/[^0-9]/g, "").slice(0, 6));
               setMk("times");
             } })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("label", { className: mk === "mins" ? "dz-opt is-on" : "dz-opt", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "\u0643\u0645 \u062F\u0642\u064A\u0642\u0629 \u062A\u0631\u064A\u062F \u062A\u0634\u063A\u064A\u0644\u0647\u0627\u061F" }),
-            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("input", { type: "text", inputMode: "numeric", pattern: "[0-9]*", dir: "ltr", value: rm2, placeholder: "\u0645\u062B\u0644\u0627\u064B 10", onFocus: () => setMk("mins"), onChange: (e6) => {
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("label", { className: mk === "mins" ? "dz-opt is-on" : "dz-opt", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { children: "\u0643\u0645 \u062F\u0642\u064A\u0642\u0629 \u062A\u0631\u064A\u062F \u062A\u0634\u063A\u064A\u0644\u0647\u0627\u061F" }),
+            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("input", { type: "text", inputMode: "numeric", pattern: "[0-9]*", dir: "ltr", value: rm2, placeholder: "\u0645\u062B\u0644\u0627\u064B 10", onFocus: () => setMk("mins"), onChange: (e6) => {
               setRm(e6.target.value.replace(/[^0-9]/g, "").slice(0, 4));
               setMk("mins");
             } })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: mk === "inf" ? "dz-opt dz-opt-inf is-on" : "dz-opt dz-opt-inf", onClick: () => setMk("inf"), children: "\u0634\u063A\u0651\u0644\u0647\u0627 \u0628\u0644\u0627 \u062A\u0648\u0642\u0641" })
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: mk === "inf" ? "dz-opt dz-opt-inf is-on" : "dz-opt dz-opt-inf", onClick: () => setMk("inf"), children: "\u0634\u063A\u0651\u0644\u0647\u0627 \u0628\u0644\u0627 \u062A\u0648\u0642\u0641" })
         ] }),
-        bad && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "dz-status", children: "\u0627\u0643\u062A\u0628 \u0631\u0642\u0645\u064B\u0627 \u0623\u0643\u0628\u0631 \u0645\u0646 \u0635\u0641\u0631" }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("label", { className: "dz-vol dz-volslider", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { className: "dz-vol-n", children: [
+        bad && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "dz-status", children: "\u0627\u0643\u062A\u0628 \u0631\u0642\u0645\u064B\u0627 \u0623\u0643\u0628\u0631 \u0645\u0646 \u0635\u0641\u0631" }),
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("label", { className: "dz-vol dz-volslider", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { className: "dz-vol-n", children: [
             "\u{1F50A} \u0627\u0644\u0635\u0648\u062A ",
             fmt(volPct),
             "%"
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("input", { type: "range", min: 0, max: 100, step: 1, value: volPct, "aria-label": "\u0645\u0633\u062A\u0648\u0649 \u0627\u0644\u0635\u0648\u062A", onChange: (e6) => {
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("input", { type: "range", min: 0, max: 100, step: 1, value: volPct, "aria-label": "\u0645\u0633\u062A\u0648\u0649 \u0627\u0644\u0635\u0648\u062A", onChange: (e6) => {
             if (uc2) uc2.update({ ...uc2.ui, vol: Number(e6.target.value) / 100 });
           } })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dz-speed", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "dz-vol-n", children: "\u0627\u0644\u0633\u0631\u0639\u0629" }),
-          [1, 1.2, 1.5].map((r) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: spd2 === r ? "dz-chip is-on" : "dz-chip", onClick: () => setSpd(r), children: r === 1 ? "1.0x" : `${r}x` }, r))
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-speed", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "dz-vol-n", children: "\u0627\u0644\u0633\u0631\u0639\u0629" }),
+          [1, 1.2, 1.5].map((r) => /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: spd2 === r ? "dz-chip is-on" : "dz-chip", onClick: () => setSpd(r), children: r === 1 ? "1.0x" : `${r}x` }, r))
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", { type: "button", ref: ambRef, className: more ? "dz-undo dz-ambbtn is-on" : "dz-undo dz-ambbtn", "aria-expanded": more, onClick: () => {
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("button", { type: "button", ref: ambRef, className: more ? "dz-undo dz-ambbtn is-on" : "dz-undo dz-ambbtn", "aria-expanded": more, onClick: () => {
           unlockAudio();
           setMore(!more);
         }, children: [
           "\u{1F33F} \u0623\u0635\u0648\u0627\u062A \u0627\u0644\u0645\u0637\u0631 \u0648\u0627\u0644\u0631\u0639\u062F \u0648\u0627\u0644\u0647\u0648\u0627\u0621 + \u062A\u062F\u0628\u0631 ",
           more ? "\u25B4" : "\u25BE"
         ] }),
-        more && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dz-more", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "dz-rate-t", children: "\u0623\u0635\u0648\u0627\u062A \u0627\u0644\u062E\u0644\u0641\u064A\u0629 (\u0628\u062F\u0648\u0646 \u0645\u0648\u0633\u064A\u0642\u0649\u060C \u0648\u062A\u0642\u0641 \u0648\u0642\u062A \u0633\u0648\u0631\u0629 \u0627\u0644\u0625\u062E\u0644\u0627\u0635)" }),
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "dz-chips", children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: ambm ? "dz-chip is-on" : "dz-chip", onClick: () => {
+        more && /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-more", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "dz-rate-t", children: "\u0623\u0635\u0648\u0627\u062A \u0627\u0644\u062E\u0644\u0641\u064A\u0629 (\u0628\u062F\u0648\u0646 \u0645\u0648\u0633\u064A\u0642\u0649\u060C \u0648\u062A\u0642\u0641 \u0648\u0642\u062A \u0633\u0648\u0631\u0629 \u0627\u0644\u0625\u062E\u0644\u0627\u0635)" }),
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "dz-chips", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: ambm ? "dz-chip is-on" : "dz-chip", onClick: () => {
             unlockAudio();
             upd({ ambm: !ambm });
           }, children: ambm ? "\u0627\u0644\u0623\u0635\u0648\u0627\u062A \u0645\u0641\u0639\u0651\u0644\u0629" : "\u0627\u0644\u0623\u0635\u0648\u0627\u062A \u0645\u062A\u0648\u0642\u0641\u0629" }) }),
           ambm && [["rain", "\u{1F327} \u0645\u0637\u0631"], ["wind", "\u{1F343} \u0647\u0648\u0627\u0621"], ["thunder", "\u26A1 \u0631\u0639\u062F"], ["birds", "\u{1F426} \u0637\u064A\u0648\u0631"]].map(([k, n]) => {
             const on = !!ambo[k];
             const v = typeof ambvs[k] === "number" ? ambvs[k] : 0.02;
-            return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dz-ambrow", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: on ? "dz-chip is-on" : "dz-chip", onClick: () => {
+            return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-ambrow", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: on ? "dz-chip is-on" : "dz-chip", onClick: () => {
                 unlockAudio();
                 upd({ ambo: { ...ambo, [k]: !on } });
               }, children: n }),
-              on && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "dz-sec", children: astat[k] === void 0 ? "" : astat[k] === "ok" ? "\u2713 \u062A\u0639\u0645\u0644" : astat[k] === "loading" ? "\u2026 \u062A\u062D\u0645\u064A\u0644" : astat[k] === "suspended" ? "\u0627\u0644\u0645\u0633 \u0632\u0631 \u25B6 \u0623\u0648 \u0623\u064A \u0632\u0631 \u0644\u064A\u0628\u062F\u0623" : "\u26A0 " + astat[k] }),
-              on && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("label", { className: "dz-sec dz-amb", children: [
+              on && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "dz-sec", children: astat[k] === void 0 ? "" : astat[k] === "ok" ? "\u2713 \u062A\u0639\u0645\u0644" : astat[k] === "loading" ? "\u2026 \u062A\u062D\u0645\u064A\u0644" : astat[k] === "suspended" ? "\u0627\u0644\u0645\u0633 \u0632\u0631 \u25B6 \u0623\u0648 \u0623\u064A \u0632\u0631 \u0644\u064A\u0628\u062F\u0623" : "\u26A0 " + astat[k] }),
+              on && /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("label", { className: "dz-sec dz-amb", children: [
                 fmt(Math.round(v * 100)),
                 "%",
-                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("input", { type: "range", min: 0, max: 50, step: 1, value: Math.round(v * 100), onChange: (e6) => upd({ ambvs: { ...ambvs, [k]: Number(e6.target.value) / 100 } }) })
+                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("input", { type: "range", min: 0, max: 50, step: 1, value: Math.round(v * 100), onChange: (e6) => upd({ ambvs: { ...ambvs, [k]: Number(e6.target.value) / 100 } }) })
               ] })
             ] }, k);
           }),
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "dz-rate-t", children: "\u062A\u062F\u0628\u0631 \u0648\u0631\u062F\u062F: \u0641\u0627\u0635\u0644 \u0628\u064A\u0646 \u0643\u0644 \u0630\u0643\u0631 \u062A\u062D\u062F\u062F\u0647 \u0623\u0646\u062A" }),
-          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dz-chips", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: ron ? "dz-chip is-on" : "dz-chip", onClick: () => upd({ ron: !ron }), children: ron ? "\u0645\u0641\u0639\u0651\u0644" : "\u0645\u062A\u0648\u0642\u0641" }),
-            /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("label", { className: "dz-sec", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "dz-rate-t", children: "\u062A\u062F\u0628\u0631 \u0648\u0631\u062F\u062F: \u0641\u0627\u0635\u0644 \u0628\u064A\u0646 \u0643\u0644 \u0630\u0643\u0631 \u062A\u062D\u062F\u062F\u0647 \u0623\u0646\u062A" }),
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-chips", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: ron ? "dz-chip is-on" : "dz-chip", onClick: () => upd({ ron: !ron }), children: ron ? "\u0645\u0641\u0639\u0651\u0644" : "\u0645\u062A\u0648\u0642\u0641" }),
+            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("label", { className: "dz-sec", children: [
               "\u0627\u0644\u0641\u0627\u0635\u0644 \u0628\u0627\u0644\u062B\u0648\u0627\u0646\u064A",
-              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("input", { type: "text", inputMode: "numeric", pattern: "[0-9]*", dir: "ltr", value: String(rs2), onChange: (e6) => {
+              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("input", { type: "text", inputMode: "numeric", pattern: "[0-9]*", dir: "ltr", value: String(rs2), onChange: (e6) => {
                 const n = Number(e6.target.value.replace(/[^0-9]/g, "").slice(0, 3));
                 upd({ rs: Math.min(600, n), ron: n > 0 ? ron : false });
               } })
             ] })
           ] })
         ] }),
-        multi && !offP && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", { type: "button", className: "dz-undo", onClick: () => setPick(!pick), children: [
+        multi && !offP && /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("button", { type: "button", className: "dz-undo", onClick: () => setPick(!pick), children: [
             pick ? "\u0625\u062E\u0641\u0627\u0621" : "\u0627\u062E\u062A\u064A\u0627\u0631 \u0627\u0644\u0623\u0630\u0643\u0627\u0631",
             " (",
             fmt(seq.length),
@@ -16779,7 +17626,7 @@ Error generating stack: ` + i.message + `
             fmt(full.length),
             ")"
           ] }),
-          pick && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Picker, { seq: full, off, setOff })
+          pick && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(Picker, { seq: full, off, setOff })
         ] })
       ] })
     ] });
@@ -16787,15 +17634,15 @@ Error generating stack: ` + i.message + `
   function SpkBtn({ seq, open, setOpen }) {
     const ps = usePlayer();
     const key = seq.map((i) => i.id).join("|");
-    return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: ps.id === key || open ? "dz-undo dz-spk is-on" : "dz-undo dz-spk", onClick: () => setOpen(!open), "aria-label": seq.length > 1 ? "\u0627\u0633\u062A\u0645\u0639 \u0644\u0644\u062F\u0648\u0631\u0629 \u0643\u0627\u0645\u0644\u0629" : `\u0627\u0633\u062A\u0645\u0639 \u0625\u0644\u0649: ${seq[0].text}`, children: seq.length > 1 ? "\u{1F50A} \u0627\u0633\u062A\u0645\u0639 \u0644\u0644\u062F\u0648\u0631\u0629" : "\u{1F50A} \u0627\u0633\u062A\u0645\u0639" });
+    return /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: ps.id === key || open ? "dz-undo dz-spk is-on" : "dz-undo dz-spk", onClick: () => setOpen(!open), "aria-label": seq.length > 1 ? "\u0627\u0633\u062A\u0645\u0639 \u0644\u0644\u062F\u0648\u0631\u0629 \u0643\u0627\u0645\u0644\u0629" : `\u0627\u0633\u062A\u0645\u0639 \u0625\u0644\u0649: ${seq[0].text}`, children: seq.length > 1 ? "\u{1F50A} \u0627\u0633\u062A\u0645\u0639 \u0644\u0644\u062F\u0648\u0631\u0629" : "\u{1F50A} \u0627\u0633\u062A\u0645\u0639" });
   }
   var FSUBS = /* @__PURE__ */ new Set();
   var FK = 0;
   var flashEmit = (id2, n) => FSUBS.forEach((f) => f(id2, n));
   function useFlash(ids) {
-    const [st4, setSt] = (0, import_react4.useState)({ glow: 0, pops: [] });
+    const [st4, setSt] = (0, import_react5.useState)({ glow: 0, pops: [] });
     const key = ids.join("|");
-    (0, import_react4.useEffect)(() => {
+    (0, import_react5.useEffect)(() => {
       const set4 = new Set(ids);
       const h = (id2, n) => {
         if (!set4.has(id2)) return;
@@ -16810,39 +17657,39 @@ Error generating stack: ` + i.message + `
     }, [key]);
     return st4;
   }
-  var Glow = ({ k }) => k ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "dz-glow", "aria-hidden": "true" }, k) : null;
-  var Pops = ({ pops }) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(import_jsx_runtime.Fragment, { children: pops.map((q) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { className: "dz-pop", "aria-hidden": "true", style: { ["--dx"]: `${q.k * 37 % 61 - 30}px`, ["--rot"]: `${q.k * 13 % 17 - 8}deg` }, children: [
+  var Glow = ({ k }) => k ? /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "dz-glow", "aria-hidden": "true" }, k) : null;
+  var Pops = ({ pops }) => /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(import_jsx_runtime2.Fragment, { children: pops.map((q) => /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { className: "dz-pop", "aria-hidden": "true", style: { ["--dx"]: `${q.k * 37 % 61 - 30}px`, ["--rot"]: `${q.k * 13 % 17 - 8}deg` }, children: [
     "+",
     q.n,
-    /* @__PURE__ */ (0, import_jsx_runtime.jsx)("i", { children: "\u2726" })
+    /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("i", { children: "\u2726" })
   ] }, q.k)) });
   function Tap({ item, count, onAdd, onUndo, disabled }) {
-    const [open, setOpen] = (0, import_react4.useState)(false);
-    const goal = import_react4.default.useContext(GoalCtx)[item.id] || 0;
-    const gi = import_react4.default.useContext(GoalInfoCtx);
+    const [open, setOpen] = (0, import_react5.useState)(false);
+    const goal = import_react5.default.useContext(GoalCtx)[item.id] || 0;
+    const gi = import_react5.default.useContext(GoalInfoCtx);
     const done2 = goal ? gi.prog(item.id) : 0;
     const hit = goal > 0 && done2 >= goal;
     const pct = goal ? Math.min(100, Math.round(done2 * 100 / goal)) : 0;
     const fl = useFlash([item.id]);
-    return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dz-tap", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Pops, { pops: fl.pops }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", { type: "button", className: hit ? "dz-tapbtn is-goal" : "dz-tapbtn", disabled, onClick: onAdd, "aria-label": `${item.text}\u060C \u0639\u062F\u062F \u0627\u0644\u064A\u0648\u0645 ${count}${goal ? `\u060C ${hit ? "\u0648\u0635\u0644\u062A \u0627\u0644\u0647\u062F\u0641" : `\u0627\u0644\u062A\u0642\u062F\u0645 ${done2} \u0645\u0646 ${goal}`}` : ""}. \u0627\u0636\u063A\u0637 \u0644\u0644\u0639\u062F`, children: [
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Glow, { k: fl.glow }),
-        hit && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "dz-goalmark", "aria-hidden": "true", children: "\u2713" }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "dz-name", children: item.text }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "dz-count", children: fmt(count) }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "dz-hint", children: goal ? `${gi.label} \xB7 ${fmt(done2)} \u0645\u0646 ${fmt(goal)}${hit ? " \u2713" : ""}` : "\u0627\u0644\u064A\u0648\u0645" }),
-        goal > 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "dz-gbar", "aria-hidden": "true", children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("i", { style: { width: pct + "%" } }) })
+    return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-tap", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(Pops, { pops: fl.pops }),
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("button", { type: "button", className: hit ? "dz-tapbtn is-goal" : "dz-tapbtn", disabled, onClick: onAdd, "aria-label": `${item.text}\u060C \u0639\u062F\u062F \u0627\u0644\u064A\u0648\u0645 ${count}${goal ? `\u060C ${hit ? "\u0648\u0635\u0644\u062A \u0627\u0644\u0647\u062F\u0641" : `\u0627\u0644\u062A\u0642\u062F\u0645 ${done2} \u0645\u0646 ${goal}`}` : ""}. \u0627\u0636\u063A\u0637 \u0644\u0644\u0639\u062F`, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(Glow, { k: fl.glow }),
+        hit && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "dz-goalmark", "aria-hidden": "true", children: "\u2713" }),
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "dz-name", children: item.text }),
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "dz-count", children: fmt(count) }),
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "dz-hint", children: goal ? `${gi.label} \xB7 ${fmt(done2)} \u0645\u0646 ${fmt(goal)}${hit ? " \u2713" : ""}` : "\u0627\u0644\u064A\u0648\u0645" }),
+        goal > 0 && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "dz-gbar", "aria-hidden": "true", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("i", { style: { width: pct + "%" } }) })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dz-tapside", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: "dz-undo", disabled: disabled || count === 0, onClick: onUndo, "aria-label": `\u062A\u0631\u0627\u062C\u0639 \u0639\u0646 \u0648\u0627\u062D\u062F\u0629: ${item.text}`, children: "\u22121" }),
-        !item.id.startsWith("c") && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SpkBtn, { seq: [item], open, setOpen })
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-tapside", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: "dz-undo", disabled: disabled || count === 0, onClick: onUndo, "aria-label": `\u062A\u0631\u0627\u062C\u0639 \u0639\u0646 \u0648\u0627\u062D\u062F\u0629: ${item.text}`, children: "\u22121" }),
+        !item.id.startsWith("c") && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(SpkBtn, { seq: [item], open, setOpen })
       ] }),
-      open && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ListenPanel, { seq: [item], onClose: () => setOpen(false) })
+      open && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(ListenPanel, { seq: [item], onClose: () => setOpen(false) })
     ] });
   }
   function Grid({ items, store, today }) {
-    return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "dz-grid", children: items.map((i) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
+    return /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "dz-grid", children: items.map((i) => /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
       Tap,
       {
         item: i,
@@ -16856,7 +17703,7 @@ Error generating stack: ` + i.message + `
   }
   function useChains() {
     const [state, setState, saved] = useLocalState("dz.chain.v1", { c: {} });
-    const latest = (0, import_react4.useRef)(null);
+    const latest = (0, import_react5.useRef)(null);
     const get = (id2) => (latest.current ?? state).c[id2] || { s: 0, r: 0 };
     const set4 = (id2, v) => {
       const next = { c: { ...(latest.current ?? state).c, [id2]: v } };
@@ -16870,7 +17717,7 @@ Error generating stack: ` + i.message + `
     return { get, set: set4, replace, all: state, ready: saved.ready };
   }
   function ChainCounter({ cid, items, store, chains, today, cycleName, group, groupNames }) {
-    const [lopen, setLopen] = (0, import_react4.useState)(false);
+    const [lopen, setLopen] = (0, import_react5.useState)(false);
     const n = items.length;
     const { s, r } = chains.get(cid);
     const step = Math.min(s, n - 1);
@@ -16880,7 +17727,7 @@ Error generating stack: ` + i.message + `
     const g = Math.floor(step / gsize);
     const start = g * gsize;
     const inGroup = step - start;
-    (0, import_react4.useEffect)(() => {
+    (0, import_react5.useEffect)(() => {
       const mine = (id2, k) => {
         const idx = items.findIndex((i) => i.id === id2);
         if (idx < 0) return false;
@@ -16917,49 +17764,49 @@ Error generating stack: ` + i.message + `
     const R6 = 54, C = 2 * Math.PI * R6;
     const top = group && groupNames ? `${cycleName} \xB7 \u0627\u0644\u0630\u0643\u0631 ${fmt(g + 1)} \u0645\u0646 ${fmt(n / gsize)} \xB7 \u0627\u0644\u0635\u064A\u063A\u0629 ${fmt(inGroup + 1)} \u0645\u0646 ${fmt(gsize)}` : `${cycleName} \xB7 \u0627\u0644\u0635\u064A\u063A\u0629 ${fmt(step + 1)} \u0645\u0646 ${fmt(n)}`;
     const fl = useFlash(items.map((i) => i.id));
-    return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dz-chain", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Pops, { pops: fl.pops }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", { type: "button", className: "dz-chainbtn", disabled, onClick: press, "aria-label": `${cur.text}. ${top}. \u0627\u0636\u063A\u0637 \u0644\u0644\u0639\u062F \u0648\u0644\u0644\u0627\u0646\u062A\u0642\u0627\u0644 \u0644\u0644\u062A\u0627\u0644\u064A\u0629`, children: [
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Glow, { k: fl.glow }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "dz-chain-top", children: top }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { className: "dz-ring", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("svg", { viewBox: "0 0 128 128", "aria-hidden": "true", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("circle", { cx: "64", cy: "64", r: R6, className: "dz-ring-bg" }),
-            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("circle", { cx: "64", cy: "64", r: R6, className: "dz-ring-fg", strokeDasharray: C, strokeDashoffset: C * (1 - inGroup / gsize) })
+    return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-chain", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(Pops, { pops: fl.pops }),
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("button", { type: "button", className: "dz-chainbtn", disabled, onClick: press, "aria-label": `${cur.text}. ${top}. \u0627\u0636\u063A\u0637 \u0644\u0644\u0639\u062F \u0648\u0644\u0644\u0627\u0646\u062A\u0642\u0627\u0644 \u0644\u0644\u062A\u0627\u0644\u064A\u0629`, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(Glow, { k: fl.glow }),
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "dz-chain-top", children: top }),
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { className: "dz-ring", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("svg", { viewBox: "0 0 128 128", "aria-hidden": "true", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("circle", { cx: "64", cy: "64", r: R6, className: "dz-ring-bg" }),
+            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("circle", { cx: "64", cy: "64", r: R6, className: "dz-ring-fg", strokeDasharray: C, strokeDashoffset: C * (1 - inGroup / gsize) })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "dz-ring-n", children: fmt(today[cur.id] || 0) })
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "dz-ring-n", children: fmt(today[cur.id] || 0) })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "dz-chain-text", children: cur.text }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { className: "dz-chain-foot", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "dz-chain-text", children: cur.text }),
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { className: "dz-chain-foot", children: [
           "\u062F\u0648\u0631\u0627\u062A \u0643\u0627\u0645\u0644\u0629: ",
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("strong", { children: fmt(r) }),
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("strong", { children: fmt(r) }),
           " \xB7 \u0627\u0636\u063A\u0637 \u0644\u0644\u0639\u062F \u0648\u0627\u0644\u0627\u0646\u062A\u0642\u0627\u0644 \u0644\u0644\u062A\u0627\u0644\u064A\u0629"
         ] })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dz-pair", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: "dz-undo", disabled: disabled || step === 0 && r === 0, onClick: undo, children: "\u22121 \u062A\u0631\u0627\u062C\u0639" }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: "dz-undo", disabled: disabled || step === 0 && r === 0, onClick: () => chains.set(cid, { s: 0, r: 0 }), children: "\u0627\u0628\u062F\u0623 \u0645\u0646 \u062C\u062F\u064A\u062F" })
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-pair", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: "dz-undo", disabled: disabled || step === 0 && r === 0, onClick: undo, children: "\u22121 \u062A\u0631\u0627\u062C\u0639" }),
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: "dz-undo", disabled: disabled || step === 0 && r === 0, onClick: () => chains.set(cid, { s: 0, r: 0 }), children: "\u0627\u0628\u062F\u0623 \u0645\u0646 \u062C\u062F\u064A\u062F" })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "dz-tapside", children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SpkBtn, { seq: items, open: lopen, setOpen: setLopen }) }),
-      lopen && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ListenPanel, { seq: items, onClose: () => setLopen(false) }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("ol", { className: "dz-steplist", children: items.slice(start, start + gsize).map((it2, k) => {
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "dz-tapside", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(SpkBtn, { seq: items, open: lopen, setOpen: setLopen }) }),
+      lopen && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(ListenPanel, { seq: items, onClose: () => setLopen(false) }),
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("ol", { className: "dz-steplist", children: items.slice(start, start + gsize).map((it2, k) => {
         const i = start + k;
-        return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", { type: "button", className: i === step ? "dz-stepbtn is-now" : i < step ? "dz-stepbtn is-done" : "dz-stepbtn", disabled, onClick: () => chains.set(cid, { s: i, r }), children: [
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "dz-stepnum", children: fmt(k + 1) }),
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "dz-steptext", children: it2.text }),
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "dz-stepcount", children: fmt(today[it2.id] || 0) })
+        return /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("li", { children: /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("button", { type: "button", className: i === step ? "dz-stepbtn is-now" : i < step ? "dz-stepbtn is-done" : "dz-stepbtn", disabled, onClick: () => chains.set(cid, { s: i, r }), children: [
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "dz-stepnum", children: fmt(k + 1) }),
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "dz-steptext", children: it2.text }),
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "dz-stepcount", children: fmt(today[it2.id] || 0) })
         ] }) }, it2.id);
       }) })
     ] });
   }
-  var sig = (t) => t.includes("\uFDFA") ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [
+  var sig = (t) => t.includes("\uFDFA") ? /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(import_jsx_runtime2.Fragment, { children: [
     t.split("\uFDFA")[0],
-    /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "dz-sig", children: "\uFDFA" }),
+    /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "dz-sig", children: "\uFDFA" }),
     t.split("\uFDFA")[1]
   ] }) : t;
   function Section({ title, children }) {
-    return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("section", { className: "dz-section", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", { className: "dz-h2", children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: sig(title) }) }),
+    return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("section", { className: "dz-section", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("h2", { className: "dz-h2", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { children: sig(title) }) }),
       children
     ] });
   }
@@ -16988,8 +17835,8 @@ Error generating stack: ` + i.message + `
     sesSubs.forEach((f) => f());
   };
   function useSes() {
-    const [, f] = (0, import_react4.useState)(0);
-    (0, import_react4.useEffect)(() => {
+    const [, f] = (0, import_react5.useState)(0);
+    (0, import_react5.useEffect)(() => {
       const h = () => f((x) => x + 1);
       sesSubs.add(h);
       return () => {
@@ -17011,8 +17858,8 @@ Error generating stack: ` + i.message + `
   };
   function SessionLine() {
     const ses = useSes();
-    const [, tick] = (0, import_react4.useState)(0);
-    (0, import_react4.useEffect)(() => {
+    const [, tick] = (0, import_react5.useState)(0);
+    (0, import_react5.useEffect)(() => {
       if (!ses.on) return;
       const t = setInterval(() => tick((x) => x + 1), 1e3);
       return () => clearInterval(t);
@@ -17020,15 +17867,15 @@ Error generating stack: ` + i.message + `
     if (!ses.start) return null;
     const el = (ses.on ? Date.now() : ses.end) - ses.start;
     const by = Object.entries(ses.by).sort((a, b) => b[1] - a[1]);
-    return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dz-ses", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [
+    return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-ses", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { children: [
         ses.on ? "\u23F1 \u0627\u0644\u062C\u0644\u0633\u0629 \u0627\u0644\u062D\u0627\u0644\u064A\u0629" : "\u0622\u062E\u0631 \u062C\u0644\u0633\u0629",
         ": ",
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("b", { children: mmss2(el) }),
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("b", { children: mmss2(el) }),
         " \xB7 \u0627\u062A\u0639\u062F\u0651 ",
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("b", { children: fmt(ses.total) })
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("b", { children: fmt(ses.total) })
       ] }),
-      by.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "dz-ses-by", children: by.map(([id2, n]) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { children: [
+      by.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "dz-ses-by", children: by.map(([id2, n]) => /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { children: [
         TEXT[id2] || id2,
         ": ",
         fmt(n)
@@ -17039,30 +17886,30 @@ Error generating stack: ` + i.message + `
     const ms2 = useMic();
     const off = useOff();
     const ses = useSes();
-    const [, tk] = (0, import_react4.useState)(0);
-    (0, import_react4.useEffect)(() => {
+    const [, tk] = (0, import_react5.useState)(0);
+    (0, import_react5.useEffect)(() => {
       const t = setInterval(() => tk((x) => x + 1), 1e3);
       return () => clearInterval(t);
     }, []);
     if (!ms2.on && !off.on) return null;
-    return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dz-now", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { className: "dz-now-t", children: [
+    return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-now", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { className: "dz-now-t", children: [
         "\u{1F399}\uFE0F \u0627\u0644\u0645\u064A\u0643\u0631\u0648\u0641\u0648\u0646 \u0634\u063A\u0627\u0644 \u0648\u064A\u0639\u062F\u0651 \u0627\u0644\u0623\u0630\u0643\u0627\u0631",
         ses.total > 0 ? ` \xB7 \u0627\u062A\u0639\u062F\u0651 ${fmt(ses.total)}` : "",
         " \xB7 \u23F1 ",
         mmss2(Date.now() - ses.start)
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: "dz-undo", onClick: () => {
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: "dz-undo", onClick: () => {
         stopMic();
         stopOff();
       }, children: "\u23F9 \u0625\u064A\u0642\u0627\u0641" })
     ] });
   }
   function MicCheck() {
-    const [open, setOpen] = (0, import_react4.useState)(false);
-    const [steps, setSteps] = (0, import_react4.useState)([]);
-    const [lv, setLv] = (0, import_react4.useState)(0);
-    const [busy, setBusy] = (0, import_react4.useState)(false);
+    const [open, setOpen] = (0, import_react5.useState)(false);
+    const [steps, setSteps] = (0, import_react5.useState)([]);
+    const [lv, setLv] = (0, import_react5.useState)(0);
+    const [busy, setBusy] = (0, import_react5.useState)(false);
     const run = async () => {
       setBusy(true);
       setSteps([]);
@@ -17072,45 +17919,45 @@ Error generating stack: ` + i.message + `
         setBusy(false);
       }
     };
-    return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dz-check", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: "dz-chip", onClick: () => setOpen(!open), "aria-expanded": open, children: open ? "\u0625\u062E\u0641\u0627\u0621 \u0641\u062D\u0635 \u0627\u0644\u0645\u064A\u0643\u0631\u0648\u0641\u0648\u0646" : "\u{1FA7A} \u0641\u062D\u0635 \u0627\u0644\u0645\u064A\u0643\u0631\u0648\u0641\u0648\u0646" }),
-      open && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dz-ses", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: "dz-chip", disabled: busy, onClick: run, children: busy ? "\u0628\u064A\u0641\u062D\u0635\u2026" : "\u0627\u0628\u062F\u0623 \u0627\u0644\u0641\u062D\u0635" }),
-        steps.map((x) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dz-check-row", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [
+    return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-check", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: "dz-chip", onClick: () => setOpen(!open), "aria-expanded": open, children: open ? "\u0625\u062E\u0641\u0627\u0621 \u0641\u062D\u0635 \u0627\u0644\u0645\u064A\u0643\u0631\u0648\u0641\u0648\u0646" : "\u{1FA7A} \u0641\u062D\u0635 \u0627\u0644\u0645\u064A\u0643\u0631\u0648\u0641\u0648\u0646" }),
+      open && /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-ses", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: "dz-chip", disabled: busy, onClick: run, children: busy ? "\u0628\u064A\u0641\u062D\u0635\u2026" : "\u0627\u0628\u062F\u0623 \u0627\u0644\u0641\u062D\u0635" }),
+        steps.map((x) => /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-check-row", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { children: [
             x.ok === null ? "\u23F3" : x.ok ? "\u2705" : "\u274C",
             " ",
-            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("b", { children: x.title }),
+            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("b", { children: x.title }),
             ": ",
             x.detail
           ] }),
-          x.fix && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "dz-mic-note", children: x.fix }),
-          x.k === "level" && busy && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "dz-lvl", children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("i", { style: { width: Math.round(lv * 100) + "%" } }) })
+          x.fix && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "dz-mic-note", children: x.fix }),
+          x.k === "level" && busy && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "dz-lvl", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("i", { style: { width: Math.round(lv * 100) + "%" } }) })
         ] }, x.k)),
-        !busy && steps.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "dz-mic-fine", children: "\u0644\u0648 \u0643\u0644 \u0627\u0644\u062E\u0637\u0648\u0627\u062A \u2705 \u0648\u0627\u0644\u062A\u0639\u0631\u0641 \u0644\u0633\u0647 \u0645\u0634 \u0634\u063A\u0627\u0644\u060C \u062C\u0631\u0651\u0628 \u062A\u0628\u062F\u0651\u0644 \u0627\u0644\u0644\u0647\u062C\u0629 (\u0645\u0635\u0631\u064A\u0629 / \u0641\u0635\u062D\u0649) \u0645\u0646 \u0627\u0644\u0623\u0632\u0631\u0627\u0631 \u0641\u0648\u0642." })
+        !busy && steps.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "dz-mic-fine", children: "\u0644\u0648 \u0643\u0644 \u0627\u0644\u062E\u0637\u0648\u0627\u062A \u2705 \u0648\u0627\u0644\u062A\u0639\u0631\u0641 \u0644\u0633\u0647 \u0645\u0634 \u0634\u063A\u0627\u0644\u060C \u062C\u0631\u0651\u0628 \u062A\u0628\u062F\u0651\u0644 \u0627\u0644\u0644\u0647\u062C\u0629 (\u0645\u0635\u0631\u064A\u0629 / \u0641\u0635\u062D\u0649) \u0645\u0646 \u0627\u0644\u0623\u0632\u0631\u0627\u0631 \u0641\u0648\u0642." })
       ] })
     ] });
   }
   function MicBar({ store }) {
     const ms2 = useMic();
     const off = useOff();
-    const [diag, setDiag] = (0, import_react4.useState)(false);
+    const [diag, setDiag] = (0, import_react5.useState)(false);
     const [saved, setSaved, sv] = useLocalState("dz.tpl.v1", {});
-    const [engine, setEngine] = (0, import_react4.useState)(ms2.supported ? "online" : "offline");
-    const [fell, setFell] = (0, import_react4.useState)(false);
-    const [train, setTrain] = (0, import_react4.useState)(false);
+    const [engine, setEngine] = (0, import_react5.useState)(ms2.supported ? "online" : "offline");
+    const [fell, setFell] = (0, import_react5.useState)(false);
+    const [train, setTrain] = (0, import_react5.useState)(false);
     const [mu, setMu, svu] = useLocalState("dz.micui.v1", { hidden: false, always: true });
-    (0, import_react4.useEffect)(() => {
+    (0, import_react5.useEffect)(() => {
       setMicLang(mu.lang || "ar-EG");
       setAlways(mu.always !== false);
       setOffAlways(mu.always !== false);
     }, [mu.always, svu.ready]);
-    const storeRef = (0, import_react4.useRef)(store);
+    const storeRef = (0, import_react5.useRef)(store);
     storeRef.current = store;
-    (0, import_react4.useEffect)(() => {
+    (0, import_react5.useEffect)(() => {
       if (sv.ready) loadTemplates(saved, setSaved, OFF_NAMES);
     }, [sv.ready]);
-    (0, import_react4.useEffect)(() => {
+    (0, import_react5.useEffect)(() => {
       setOnNetworkFail(() => {
         setEngine("offline");
         setFell(true);
@@ -17119,9 +17966,9 @@ Error generating stack: ` + i.message + `
     }, []);
     const hit = (id2, n) => VOICE.fn(id2, n);
     const blocked = typeof document !== "undefined" && document.featurePolicy?.allowsFeature?.("microphone") === false;
-    if (blocked) return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dz-mic dz-mic-off", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("b", { children: "\u{1F399}\uFE0F \u0627\u0644\u0639\u062F \u0628\u0627\u0644\u0635\u0648\u062A" }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "\u0627\u0644\u0645\u064A\u0643\u0631\u0648\u0641\u0648\u0646 \u0645\u0642\u0641\u0648\u0644 \u0645\u0646 \u0627\u0644\u0645\u062A\u0635\u0641\u062D \u062F\u0627\u062E\u0644 \u0635\u0641\u062D\u0629 \u0627\u0644\u0631\u0627\u0628\u0637 \u062F\u064A (\u0627\u0644\u0635\u0641\u062D\u0627\u062A \u0627\u0644\u0645\u0633\u062A\u0636\u0627\u0641\u0629 \u0645\u0634 \u0645\u0633\u0645\u0648\u062D \u0644\u0647\u0627 \u0628\u064A\u0647). \u0627\u0644\u0639\u062F \u0628\u0627\u0644\u0635\u0648\u062A \u0634\u063A\u0627\u0644 \u0628\u0633 \u0641\u064A \u0646\u0633\u062E\u0629 \u0627\u0644\u0648\u064A\u0646\u062F\u0648\u0632 \u0627\u0644\u0645\u062D\u0645\u0651\u0644\u0629. \u0627\u0644\u0639\u062F \u0628\u0627\u0644\u0644\u0645\u0633 \u0634\u063A\u0627\u0644 \u0639\u0627\u062F\u064A." })
+    if (blocked) return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-mic dz-mic-off", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("b", { children: "\u{1F399}\uFE0F \u0627\u0644\u0639\u062F \u0628\u0627\u0644\u0635\u0648\u062A" }),
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { children: "\u0627\u0644\u0645\u064A\u0643\u0631\u0648\u0641\u0648\u0646 \u0645\u0642\u0641\u0648\u0644 \u0645\u0646 \u0627\u0644\u0645\u062A\u0635\u0641\u062D \u062F\u0627\u062E\u0644 \u0635\u0641\u062D\u0629 \u0627\u0644\u0631\u0627\u0628\u0637 \u062F\u064A (\u0627\u0644\u0635\u0641\u062D\u0627\u062A \u0627\u0644\u0645\u0633\u062A\u0636\u0627\u0641\u0629 \u0645\u0634 \u0645\u0633\u0645\u0648\u062D \u0644\u0647\u0627 \u0628\u064A\u0647). \u0627\u0644\u0639\u062F \u0628\u0627\u0644\u0635\u0648\u062A \u0634\u063A\u0627\u0644 \u0628\u0633 \u0641\u064A \u0646\u0633\u062E\u0629 \u0627\u0644\u0648\u064A\u0646\u062F\u0648\u0632 \u0627\u0644\u0645\u062D\u0645\u0651\u0644\u0629. \u0627\u0644\u0639\u062F \u0628\u0627\u0644\u0644\u0645\u0633 \u0634\u063A\u0627\u0644 \u0639\u0627\u062F\u064A." })
     ] });
     const anyOn = ms2.on || off.on;
     const switchTo = (e6) => {
@@ -17147,106 +17994,115 @@ Error generating stack: ` + i.message + `
       stopMic();
       stopOff();
     };
-    if (mu.hidden) return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dz-mic dz-mic-min", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: "dz-undo", onClick: () => setMu({ ...mu, hidden: false }), children: "\u{1F399}\uFE0F \u0625\u0638\u0647\u0627\u0631 \u0634\u0631\u064A\u0637 \u0627\u0644\u0645\u064A\u0643\u0631\u0648\u0641\u0648\u0646" }),
-      anyOn && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "dz-led is-live" }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "dz-mic-state", children: "\u0627\u0644\u0645\u064A\u0643\u0631\u0648\u0641\u0648\u0646 \u0634\u063A\u0627\u0644" }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: "dz-undo", onClick: stopAll, children: "\u23F9 \u0625\u064A\u0642\u0627\u0641" })
+    if (mu.hidden) return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-mic dz-mic-min", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: "dz-undo", onClick: () => setMu({ ...mu, hidden: false }), children: "\u{1F399}\uFE0F \u0625\u0638\u0647\u0627\u0631 \u0634\u0631\u064A\u0637 \u0627\u0644\u0645\u064A\u0643\u0631\u0648\u0641\u0648\u0646" }),
+      anyOn && /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(import_jsx_runtime2.Fragment, { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "dz-led is-live" }),
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "dz-mic-state", children: "\u0627\u0644\u0645\u064A\u0643\u0631\u0648\u0641\u0648\u0646 \u0634\u063A\u0627\u0644" }),
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: "dz-undo", onClick: stopAll, children: "\u23F9 \u0625\u064A\u0642\u0627\u0641" })
       ] })
     ] });
-    return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: anyOn ? "dz-mic is-on" : "dz-mic", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dz-mic-top", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("label", { className: "dz-mic-always", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("input", { type: "checkbox", checked: mu.always !== false, onChange: (e6) => setMu({ ...mu, always: e6.target.checked }) }),
+    return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: anyOn ? "dz-mic is-on" : "dz-mic", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-mic-top", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("label", { className: "dz-mic-always", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("input", { type: "checkbox", checked: mu.always !== false, onChange: (e6) => setMu({ ...mu, always: e6.target.checked }) }),
           " \u062A\u0634\u063A\u064A\u0644 \u062F\u0627\u0626\u0645 (\u064A\u0643\u0645\u0651\u0644 \u0644\u0648\u062D\u062F\u0647 \u0628\u0639\u062F \u0627\u0644\u0635\u0645\u062A \u0648\u0627\u0644\u0623\u062E\u0637\u0627\u0621)"
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: "dz-undo", onClick: () => setMu({ ...mu, hidden: true }), children: "\u0625\u062E\u0641\u0627\u0621 \u0627\u0644\u0634\u0631\u064A\u0637" })
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: "dz-undo", onClick: () => setMu({ ...mu, hidden: true }), children: "\u0625\u062E\u0641\u0627\u0621 \u0627\u0644\u0634\u0631\u064A\u0637" })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dz-mic-eng", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: engine === "online" ? "dz-opt is-on" : "dz-opt", disabled: !ms2.supported, onClick: () => switchTo("online"), children: "\u{1F310} \u0628\u0625\u0646\u062A\u0631\u0646\u062A (\u0627\u0644\u0645\u062A\u0635\u0641\u062D)" }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: engine === "offline" ? "dz-opt is-on" : "dz-opt", onClick: () => switchTo("offline"), children: "\u{1F4F4} \u0628\u062F\u0648\u0646 \u0625\u0646\u062A\u0631\u0646\u062A (\u062A\u062C\u0631\u064A\u0628\u064A)" })
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-mic-eng", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: engine === "online" ? "dz-opt is-on" : "dz-opt", disabled: !ms2.supported, onClick: () => switchTo("online"), children: "\u{1F310} \u0628\u0625\u0646\u062A\u0631\u0646\u062A (\u0627\u0644\u0645\u062A\u0635\u0641\u062D)" }),
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: engine === "offline" ? "dz-opt is-on" : "dz-opt", onClick: () => switchTo("offline"), children: "\u{1F4F4} \u0628\u062F\u0648\u0646 \u0625\u0646\u062A\u0631\u0646\u062A (\u062A\u062C\u0631\u064A\u0628\u064A)" })
       ] }),
-      fell && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "dz-mic-note", children: "\u0645\u0641\u064A\u0634 \u0627\u062A\u0635\u0627\u0644 \u0628\u062E\u062F\u0645\u0629 \u0627\u0644\u062A\u0639\u0631\u0641 \u0639\u0644\u0649 \u0627\u0644\u0643\u0644\u0627\u0645\u060C \u0641\u0627\u062A\u062D\u0648\u0644\u0646\u0627 \u0644\u0644\u0648\u0636\u0639 \u0628\u062F\u0648\u0646 \u0625\u0646\u062A\u0631\u0646\u062A. \u0645\u062D\u062A\u0627\u062C \u062A\u0633\u062C\u0651\u0644 \u0635\u0648\u062A\u0643 \u0639\u0644\u0649 \u0627\u0644\u0623\u0630\u0643\u0627\u0631 \u0645\u0631\u0629 \u0648\u0627\u062D\u062F\u0629." }),
-      engine === "online" && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dz-mic-row", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: "dz-mic-btn", onClick: () => ms2.on ? stopMic() : startOn(), "aria-pressed": ms2.on, children: ms2.on ? "\u23F9 \u0625\u064A\u0642\u0627\u0641" : "\u{1F399}\uFE0F \u0627\u0628\u062F\u0623 \u0627\u0644\u0639\u062F \u0628\u0627\u0644\u0635\u0648\u062A" }),
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: ms2.on ? ms2.listening ? ms2.speaking ? "dz-led is-speak" : "dz-led is-live" : "dz-led is-wait" : "dz-led" }),
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "dz-mic-state", children: !ms2.on ? "\u0627\u0644\u0645\u064A\u0643\u0631\u0648\u0641\u0648\u0646 \u0645\u0642\u0641\u0648\u0644" : !ms2.listening ? "\u0628\u064A\u062C\u0647\u0651\u0632\u2026" : ms2.speaking ? "\u0628\u0633\u0645\u0639\u0643\u2026" : "\u0628\u0633\u0645\u0639" })
+      fell && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "dz-mic-note", children: "\u0645\u0641\u064A\u0634 \u0627\u062A\u0635\u0627\u0644 \u0628\u062E\u062F\u0645\u0629 \u0627\u0644\u062A\u0639\u0631\u0641 \u0639\u0644\u0649 \u0627\u0644\u0643\u0644\u0627\u0645\u060C \u0641\u0627\u062A\u062D\u0648\u0644\u0646\u0627 \u0644\u0644\u0648\u0636\u0639 \u0628\u062F\u0648\u0646 \u0625\u0646\u062A\u0631\u0646\u062A. \u0645\u062D\u062A\u0627\u062C \u062A\u0633\u062C\u0651\u0644 \u0635\u0648\u062A\u0643 \u0639\u0644\u0649 \u0627\u0644\u0623\u0630\u0643\u0627\u0631 \u0645\u0631\u0629 \u0648\u0627\u062D\u062F\u0629." }),
+      engine === "online" && /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(import_jsx_runtime2.Fragment, { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-mic-row", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: "dz-mic-btn", onClick: () => ms2.on ? stopMic() : startOn(), "aria-pressed": ms2.on, children: ms2.on ? "\u23F9 \u0625\u064A\u0642\u0627\u0641" : "\u{1F399}\uFE0F \u0627\u0628\u062F\u0623 \u0627\u0644\u0639\u062F \u0628\u0627\u0644\u0635\u0648\u062A" }),
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: ms2.on ? ms2.listening ? ms2.speaking ? "dz-led is-speak" : "dz-led is-live" : "dz-led is-wait" : "dz-led" }),
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "dz-mic-state", children: !ms2.on ? "\u0627\u0644\u0645\u064A\u0643\u0631\u0648\u0641\u0648\u0646 \u0645\u0642\u0641\u0648\u0644" : !ms2.listening ? "\u0628\u064A\u062C\u0647\u0651\u0632\u2026" : ms2.speaking ? "\u0628\u0633\u0645\u0639\u0643\u2026" : "\u0628\u0633\u0645\u0639" })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "dz-mic-eng", children: [["ar-EG", "\u0644\u0647\u062C\u0629 \u0645\u0635\u0631\u064A\u0629"], ["ar-SA", "\u0639\u0631\u0628\u064A \u0641\u0635\u062D\u0649"]].map(([k, n]) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: (mu.lang || "ar-EG") === k ? "dz-chip is-on" : "dz-chip", onClick: () => setMu({ ...mu, lang: k }), children: n }, k)) }),
-        ms2.retry && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "dz-mic-note", children: ms2.retry }),
-        ms2.on && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "dz-mic-heard", children: ms2.heard ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "dz-mic-eng", children: [["ar-EG", "\u0644\u0647\u062C\u0629 \u0645\u0635\u0631\u064A\u0629"], ["ar-SA", "\u0639\u0631\u0628\u064A \u0641\u0635\u062D\u0649"]].map(([k, n]) => /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: (mu.lang || "ar-EG") === k ? "dz-chip is-on" : "dz-chip", onClick: () => setMu({ ...mu, lang: k }), children: n }, k)) }),
+        ms2.retry && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "dz-mic-note", children: ms2.retry }),
+        ms2.on && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "dz-mic-heard", children: ms2.heard ? /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(import_jsx_runtime2.Fragment, { children: [
           "\u0633\u0645\u0639\u062A: ",
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("b", { children: ms2.heard })
-        ] }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(import_jsx_runtime.Fragment, { children: "\u0642\u064F\u0644 \u0623\u064A \u0630\u0643\u0631\u060C \u0648\u0628\u064A\u062A\u0639\u0631\u0651\u0641 \u0639\u0644\u064A\u0647 \u0644\u0648\u062D\u062F\u0647" }) }),
-        ms2.on && ms2.note && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "dz-mic-note", children: ms2.note }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: "dz-mini", onClick: () => setDiag(!diag), "aria-expanded": diag, children: diag ? "\u0625\u062E\u0641\u0627\u0621 \u0627\u0644\u062A\u0634\u062E\u064A\u0635" : "\u062A\u0634\u062E\u064A\u0635 (\u0622\u062E\u0631 \u0645\u0627 \u0633\u0645\u0639\u0647)" }),
-        diag && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "dz-ses", children: ms2.diag.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { children: "\u0644\u0633\u0647 \u0645\u0641\u064A\u0634 \u062D\u0627\u062C\u0629. \u0627\u0644\u0623\u0631\u0642\u0627\u0645 \u062F\u064A \u0628\u062A\u062A\u0645\u0633\u062D \u0644\u0645\u0627 \u062A\u0648\u0642\u0641 \u0627\u0644\u0645\u064A\u0643\u0631\u0648\u0641\u0648\u0646 \u0648\u0645\u0634 \u0628\u062A\u062A\u062D\u0641\u0638." }) : ms2.diag.map((r, k) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("b", { children: ms2.heard })
+        ] }) : /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(import_jsx_runtime2.Fragment, { children: "\u0642\u064F\u0644 \u0623\u064A \u0630\u0643\u0631\u060C \u0648\u0628\u064A\u062A\u0639\u0631\u0651\u0641 \u0639\u0644\u064A\u0647 \u0644\u0648\u062D\u062F\u0647" }) }),
+        ms2.on && ms2.weak && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "dz-mic-note", children: "\u0627\u0644\u0635\u0648\u062A \u0648\u0627\u0635\u0644 \u0636\u0639\u064A\u0641. \u0642\u0631\u0651\u0628 \u0645\u0646 \u0627\u0644\u0645\u064A\u0643\u0631\u0648\u0641\u0648\u0646 \u0623\u0648 \u0627\u0631\u0641\u0639 \u0645\u0633\u062A\u0648\u0649 \u0627\u0644\u0645\u064A\u0643\u0631\u0648\u0641\u0648\u0646 \u0641\u064A \u0625\u0639\u062F\u0627\u062F\u0627\u062A \u0627\u0644\u0635\u0648\u062A \u0641\u064A \u0648\u064A\u0646\u062F\u0648\u0632 (Input volume)\u060C \u0627\u0644\u062A\u0637\u0628\u064A\u0642 \u0645\u0634 \u0628\u064A\u0642\u062F\u0631 \u064A\u0631\u0641\u0639 \u0635\u0648\u062A \u0627\u0644\u0645\u062A\u0635\u0641\u062D \u0628\u0646\u0641\u0633\u0647." }),
+        ms2.on && ms2.level >= 0 && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "dz-lvl", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("i", { style: { width: `${Math.min(100, Math.round(ms2.level * 300))}%` } }) }),
+        ms2.on && ms2.seq.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-seq", "aria-label": "\u0627\u0644\u0623\u0639\u062F\u0627\u062F \u0627\u0644\u0645\u062D\u0633\u0648\u0628\u0629", children: [
+          ms2.seq.slice(-5).map((x) => /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "dz-seqn", title: TEXT[x.id] || "", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("b", { children: fmt(x.n) }) }, x.n)),
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { className: "dz-seqt", children: [
+            "\u0627\u0644\u0645\u062D\u0633\u0648\u0628: ",
+            fmt(ms2.seq.length)
+          ] })
+        ] }),
+        ms2.on && ms2.note && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "dz-mic-note", children: ms2.note }),
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: "dz-mini", onClick: () => setDiag(!diag), "aria-expanded": diag, children: diag ? "\u0625\u062E\u0641\u0627\u0621 \u0627\u0644\u062A\u0634\u062E\u064A\u0635" : "\u062A\u0634\u062E\u064A\u0635 (\u0622\u062E\u0631 \u0645\u0627 \u0633\u0645\u0639\u0647)" }),
+        diag && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "dz-ses", children: ms2.diag.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { children: "\u0644\u0633\u0647 \u0645\u0641\u064A\u0634 \u062D\u0627\u062C\u0629. \u0627\u0644\u0623\u0631\u0642\u0627\u0645 \u062F\u064A \u0628\u062A\u062A\u0645\u0633\u062D \u0644\u0645\u0627 \u062A\u0648\u0642\u0641 \u0627\u0644\u0645\u064A\u0643\u0631\u0648\u0641\u0648\u0646 \u0648\u0645\u0634 \u0628\u062A\u062A\u062D\u0641\u0638." }) : ms2.diag.map((r, k) => /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { children: [
           r.fin ? "\u2714 \u0646\u0647\u0627\u0626\u064A" : "\u2026 \u0645\u0624\u0642\u062A",
           " \xB7 \u0633\u0645\u0639: ",
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("b", { children: r.heard }),
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("b", { children: r.heard }),
           " \xB7 \u0627\u062A\u0639\u062F\u0651: ",
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("b", { children: r.counted })
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("b", { children: r.counted })
         ] }, k)) }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SessionLine, {}),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)(MicCheck, {}),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "dz-mic-fine", children: "\u0627\u0633\u062A\u0647\u0644\u0627\u0643 \u0627\u0644\u0625\u0646\u062A\u0631\u0646\u062A: \u0627\u0644\u0635\u0648\u062A \u0628\u064A\u062A\u0628\u0639\u062A \u0644\u062E\u062F\u0645\u0629 \u0627\u0644\u062A\u0639\u0631\u0641 \u0639\u0644\u0649 \u0627\u0644\u0643\u0644\u0627\u0645 \u0637\u0648\u0644 \u0645\u0627 \u0627\u0644\u0645\u064A\u0643\u0631\u0648\u0641\u0648\u0646 \u0634\u063A\u0627\u0644 \u062D\u062A\u0649 \u0641\u064A \u0627\u0644\u0635\u0645\u062A. \u062A\u0642\u062F\u064A\u0631 \u062A\u0642\u0631\u064A\u0628\u064A \u0645\u0646 \u0642\u064A\u0627\u0633 \u0642\u062F\u064A\u0645: \u062D\u0648\u0627\u0644\u064A 70 \u0645\u064A\u062C\u0627 \u0641\u064A \u0627\u0644\u0633\u0627\u0639\u0629 (\u0642\u062F \u064A\u062E\u062A\u0644\u0641). \u0627\u0642\u0641\u0644 \u0627\u0644\u0645\u064A\u0643\u0631\u0648\u0641\u0648\u0646 \u0644\u0645\u0627 \u0645\u0634 \u0628\u062A\u0633\u062A\u062E\u062F\u0645\u0647." }),
-        ms2.error && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "dz-mic-err", children: ms2.error })
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(SessionLine, {}),
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(MicCheck, {}),
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "dz-mic-fine", children: "\u0627\u0633\u062A\u0647\u0644\u0627\u0643 \u0627\u0644\u0625\u0646\u062A\u0631\u0646\u062A: \u0627\u0644\u0635\u0648\u062A \u0628\u064A\u062A\u0628\u0639\u062A \u0644\u062E\u062F\u0645\u0629 \u0627\u0644\u062A\u0639\u0631\u0641 \u0639\u0644\u0649 \u0627\u0644\u0643\u0644\u0627\u0645 \u0637\u0648\u0644 \u0645\u0627 \u0627\u0644\u0645\u064A\u0643\u0631\u0648\u0641\u0648\u0646 \u0634\u063A\u0627\u0644 \u062D\u062A\u0649 \u0641\u064A \u0627\u0644\u0635\u0645\u062A. \u062A\u0642\u062F\u064A\u0631 \u062A\u0642\u0631\u064A\u0628\u064A \u0645\u0646 \u0642\u064A\u0627\u0633 \u0642\u062F\u064A\u0645: \u062D\u0648\u0627\u0644\u064A 70 \u0645\u064A\u062C\u0627 \u0641\u064A \u0627\u0644\u0633\u0627\u0639\u0629 (\u0642\u062F \u064A\u062E\u062A\u0644\u0641). \u0627\u0642\u0641\u0644 \u0627\u0644\u0645\u064A\u0643\u0631\u0648\u0641\u0648\u0646 \u0644\u0645\u0627 \u0645\u0634 \u0628\u062A\u0633\u062A\u062E\u062F\u0645\u0647." }),
+        ms2.error && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "dz-mic-err", children: ms2.error })
       ] }),
-      engine === "offline" && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dz-mic-row", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: "dz-mic-btn", disabled: !sv.ready || nTrained === 0 || off.recId !== null, onClick: () => off.on ? stopOff() : startOffl(), "aria-pressed": off.on, children: off.on ? "\u23F9 \u0625\u064A\u0642\u0627\u0641" : "\u{1F399}\uFE0F \u0627\u0628\u062F\u0623 \u0627\u0644\u0639\u062F \u0628\u0627\u0644\u0635\u0648\u062A" }),
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: off.on || off.recId ? off.speaking ? "dz-led is-speak" : "dz-led is-live" : "dz-led" }),
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "dz-mic-state", children: off.recId ? "\u0642\u064F\u0644 \u0627\u0644\u0630\u0643\u0631 \u0627\u0644\u0622\u0646\u2026" : !off.on ? "\u0645\u0642\u0641\u0648\u0644" : off.speaking ? "\u0628\u0633\u0645\u0639\u0643\u2026" : "\u0628\u0633\u0645\u0639" })
+      engine === "offline" && /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(import_jsx_runtime2.Fragment, { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-mic-row", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: "dz-mic-btn", disabled: !sv.ready || nTrained === 0 || off.recId !== null, onClick: () => off.on ? stopOff() : startOffl(), "aria-pressed": off.on, children: off.on ? "\u23F9 \u0625\u064A\u0642\u0627\u0641" : "\u{1F399}\uFE0F \u0627\u0628\u062F\u0623 \u0627\u0644\u0639\u062F \u0628\u0627\u0644\u0635\u0648\u062A" }),
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: off.on || off.recId ? off.speaking ? "dz-led is-speak" : "dz-led is-live" : "dz-led" }),
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "dz-mic-state", children: off.recId ? "\u0642\u064F\u0644 \u0627\u0644\u0630\u0643\u0631 \u0627\u0644\u0622\u0646\u2026" : !off.on ? "\u0645\u0642\u0641\u0648\u0644" : off.speaking ? "\u0628\u0633\u0645\u0639\u0643\u2026" : "\u0628\u0633\u0645\u0639" })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "dz-mic-note", children: "\u26A0 \u0627\u0644\u0648\u0636\u0639 \u062F\u0647 \u062A\u062C\u0631\u064A\u0628\u064A \u0648\u062F\u0642\u062A\u0647 \u0623\u0636\u0639\u0641 \u0645\u0646 \u0627\u0644\u0648\u0636\u0639 \u0628\u0625\u0646\u062A\u0631\u0646\u062A \u0645\u0639 \u0627\u0644\u0635\u0648\u062A \u0627\u0644\u062D\u0642\u064A\u0642\u064A (\u0627\u0644\u0636\u0648\u0636\u0627\u0621 \u0648\u0627\u0644\u0633\u0631\u0639\u0629 \u0628\u062A\u0623\u062B\u0631 \u0639\u0644\u064A\u0647). \u0627\u0644\u0623\u0641\u0636\u0644 \u062A\u0633\u062A\u062E\u062F\u0645 \xAB\u0628\u0625\u0646\u062A\u0631\u0646\u062A\xBB \u0644\u0648 \u0645\u062A\u0627\u062D." }),
-        nTrained === 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "dz-mic-note", children: "\u0633\u062C\u0651\u0644 \u0635\u0648\u062A\u0643 \u0639\u0644\u0649 \u0627\u0644\u0623\u0630\u0643\u0627\u0631 \u0627\u0644\u0623\u0648\u0644 (\u0643\u0630\u0627 \u0645\u0631\u0629 \u0644\u0643\u0644 \u0630\u0643\u0631)\u060C \u0648\u0628\u0639\u062F\u0647\u0627 \u064A\u0634\u062A\u063A\u0644 \u0645\u0646 \u063A\u064A\u0631 \u0625\u0646\u062A\u0631\u0646\u062A." }),
-        off.on && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "dz-mic-heard", children: off.heard ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "dz-mic-note", children: "\u26A0 \u0627\u0644\u0648\u0636\u0639 \u062F\u0647 \u062A\u062C\u0631\u064A\u0628\u064A \u0648\u062F\u0642\u062A\u0647 \u0623\u0636\u0639\u0641 \u0645\u0646 \u0627\u0644\u0648\u0636\u0639 \u0628\u0625\u0646\u062A\u0631\u0646\u062A \u0645\u0639 \u0627\u0644\u0635\u0648\u062A \u0627\u0644\u062D\u0642\u064A\u0642\u064A (\u0627\u0644\u0636\u0648\u0636\u0627\u0621 \u0648\u0627\u0644\u0633\u0631\u0639\u0629 \u0628\u062A\u0623\u062B\u0631 \u0639\u0644\u064A\u0647). \u0627\u0644\u0623\u0641\u0636\u0644 \u062A\u0633\u062A\u062E\u062F\u0645 \xAB\u0628\u0625\u0646\u062A\u0631\u0646\u062A\xBB \u0644\u0648 \u0645\u062A\u0627\u062D." }),
+        nTrained === 0 && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "dz-mic-note", children: "\u0633\u062C\u0651\u0644 \u0635\u0648\u062A\u0643 \u0639\u0644\u0649 \u0627\u0644\u0623\u0630\u0643\u0627\u0631 \u0627\u0644\u0623\u0648\u0644 (\u0643\u0630\u0627 \u0645\u0631\u0629 \u0644\u0643\u0644 \u0630\u0643\u0631)\u060C \u0648\u0628\u0639\u062F\u0647\u0627 \u064A\u0634\u062A\u063A\u0644 \u0645\u0646 \u063A\u064A\u0631 \u0625\u0646\u062A\u0631\u0646\u062A." }),
+        off.on && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "dz-mic-heard", children: off.heard ? /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(import_jsx_runtime2.Fragment, { children: [
           "\u0627\u062A\u0639\u0631\u0651\u0641 \u0639\u0644\u0649: ",
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("b", { children: off.heard })
-        ] }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(import_jsx_runtime.Fragment, { children: "\u0642\u064F\u0644 \u0623\u064A \u0630\u0643\u0631 \u0645\u0646 \u0627\u0644\u0644\u064A \u0633\u062C\u0644\u062A\u0647\u060C \u062D\u062A\u0649 \u0648\u0631\u0627 \u0628\u0639\u0636 \u0628\u0633\u0631\u0639\u0629" }) }),
-        off.note && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "dz-mic-note", children: off.note }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SessionLine, {}),
-        off.error && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "dz-mic-err", children: off.error }),
-        ms2.error && !off.error && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "dz-mic-err", children: ms2.error }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", { type: "button", className: "dz-undo", onClick: () => setTrain(!train), "aria-expanded": train, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("b", { children: off.heard })
+        ] }) : /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(import_jsx_runtime2.Fragment, { children: "\u0642\u064F\u0644 \u0623\u064A \u0630\u0643\u0631 \u0645\u0646 \u0627\u0644\u0644\u064A \u0633\u062C\u0644\u062A\u0647\u060C \u062D\u062A\u0649 \u0648\u0631\u0627 \u0628\u0639\u0636 \u0628\u0633\u0631\u0639\u0629" }) }),
+        off.note && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "dz-mic-note", children: off.note }),
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(SessionLine, {}),
+        off.error && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "dz-mic-err", children: off.error }),
+        ms2.error && !off.error && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "dz-mic-err", children: ms2.error }),
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("button", { type: "button", className: "dz-undo", onClick: () => setTrain(!train), "aria-expanded": train, children: [
           train ? "\u0625\u062E\u0641\u0627\u0621" : "\u{1F393} \u062A\u0633\u062C\u064A\u0644 \u0635\u0648\u062A\u0643 \u0639\u0644\u0649 \u0627\u0644\u0623\u0630\u0643\u0627\u0631",
           " ",
           nTrained > 0 && !train ? `(${fmt(nTrained)} \u0645\u0633\u062C\u0651\u0644)` : ""
         ] }),
-        train && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dz-train", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "dz-mic-note", children: "\u0627\u0636\u063A\u0637 \xAB\u0633\u062C\u0651\u0644\xBB \u0648\u0642\u064F\u0644 \u0627\u0644\u0630\u0643\u0631 \u0628\u0635\u0648\u062A\u0643 \u0627\u0644\u0639\u0627\u062F\u064A \u0645\u0646 \u063A\u064A\u0631 \u0643\u0644\u0627\u0645 \u062A\u0627\u0646\u064A\u060C \u0648\u0633\u062C\u0651\u0644 \u0643\u0644 \u0630\u0643\u0631 \u0643\u0627\u0645 \u0645\u0631\u0629 \u062A\u062D\u0628 (\u0644\u062D\u062F 12 \u0639\u064A\u0651\u0646\u0629)\u060C \u0645\u0631\u0629 \u0628\u0627\u0644\u0631\u0627\u062D\u0629 \u0648\u0645\u0631\u0629 \u0628\u0633\u0631\u0639\u0629. \u0627\u0636\u063A\u0637 \u0639\u0644\u0649 \u0631\u0642\u0645 \u0627\u0644\u0639\u064A\u0651\u0646\u0629 \u2715 \u0639\u0644\u0634\u0627\u0646 \u062A\u062D\u0630\u0641 \u0639\u064A\u0651\u0646\u0629 \u0648\u062D\u0634\u0629. \u0643\u0644 \u0645\u0627 \u062A\u0632\u0648\u062F \u0627\u0644\u0639\u064A\u0646\u0627\u062A \u0627\u0644\u062F\u0642\u0629 \u0628\u062A\u062A\u062D\u0633\u0646\u060C \u0648\u0628\u064A\u062A\u0639\u0644\u0645 \u0643\u0645\u0627\u0646 \u0645\u0646 \u062A\u0635\u062D\u064A\u062D\u0643 \u0628\u0640 +1 \u0648 \u22121." }),
+        train && /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-train", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "dz-mic-note", children: "\u0627\u0636\u063A\u0637 \xAB\u0633\u062C\u0651\u0644\xBB \u0648\u0642\u064F\u0644 \u0627\u0644\u0630\u0643\u0631 \u0628\u0635\u0648\u062A\u0643 \u0627\u0644\u0639\u0627\u062F\u064A \u0645\u0646 \u063A\u064A\u0631 \u0643\u0644\u0627\u0645 \u062A\u0627\u0646\u064A\u060C \u0648\u0633\u062C\u0651\u0644 \u0643\u0644 \u0630\u0643\u0631 \u0643\u0627\u0645 \u0645\u0631\u0629 \u062A\u062D\u0628 (\u0644\u062D\u062F 12 \u0639\u064A\u0651\u0646\u0629)\u060C \u0645\u0631\u0629 \u0628\u0627\u0644\u0631\u0627\u062D\u0629 \u0648\u0645\u0631\u0629 \u0628\u0633\u0631\u0639\u0629. \u0627\u0636\u063A\u0637 \u0639\u0644\u0649 \u0631\u0642\u0645 \u0627\u0644\u0639\u064A\u0651\u0646\u0629 \u2715 \u0639\u0644\u0634\u0627\u0646 \u062A\u062D\u0630\u0641 \u0639\u064A\u0651\u0646\u0629 \u0648\u062D\u0634\u0629. \u0643\u0644 \u0645\u0627 \u062A\u0632\u0648\u062F \u0627\u0644\u0639\u064A\u0646\u0627\u062A \u0627\u0644\u062F\u0642\u0629 \u0628\u062A\u062A\u062D\u0633\u0646\u060C \u0648\u0628\u064A\u062A\u0639\u0644\u0645 \u0643\u0645\u0627\u0646 \u0645\u0646 \u062A\u0635\u062D\u064A\u062D\u0643 \u0628\u0640 +1 \u0648 \u22121." }),
           OFF_ITEMS.map((i) => {
             const n = off.trained[i.id] || 0;
             const rec2 = off.recId === i.id;
-            return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dz-train-row", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "dz-train-name", children: i.text }),
-              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "dz-train-n", children: n ? `${fmt(n)} \u0639\u064A\u0651\u0646\u0629` : "\u063A\u064A\u0631 \u0645\u0633\u062C\u0651\u0644" }),
-              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: "dz-undo", disabled: off.recId !== null && !rec2, onClick: () => rec2 ? cancelRecord() : recordSample(i.id), children: rec2 ? "\u0625\u0644\u063A\u0627\u0621" : "\u23FA \u0633\u062C\u0651\u0644" }),
-              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: "dz-undo", disabled: !n, onClick: () => clearTemplates(i.id), "aria-label": `\u0645\u0633\u062D \u0643\u0644 \u062A\u0633\u062C\u064A\u0644\u0627\u062A ${i.text}`, children: "\u0645\u0633\u062D \u0627\u0644\u0643\u0644" }),
-              n > 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "dz-chips", children: Array.from({ length: n }, (_, k) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", { type: "button", className: "dz-chip", onClick: () => delSample(i.id, k), "aria-label": `\u062D\u0630\u0641 \u0627\u0644\u0639\u064A\u0651\u0646\u0629 ${k + 1} \u0645\u0646 ${i.text}`, children: [
+            return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-train-row", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "dz-train-name", children: i.text }),
+              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "dz-train-n", children: n ? `${fmt(n)} \u0639\u064A\u0651\u0646\u0629` : "\u063A\u064A\u0631 \u0645\u0633\u062C\u0651\u0644" }),
+              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: "dz-undo", disabled: off.recId !== null && !rec2, onClick: () => rec2 ? cancelRecord() : recordSample(i.id), children: rec2 ? "\u0625\u0644\u063A\u0627\u0621" : "\u23FA \u0633\u062C\u0651\u0644" }),
+              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: "dz-undo", disabled: !n, onClick: () => clearTemplates(i.id), "aria-label": `\u0645\u0633\u062D \u0643\u0644 \u062A\u0633\u062C\u064A\u0644\u0627\u062A ${i.text}`, children: "\u0645\u0633\u062D \u0627\u0644\u0643\u0644" }),
+              n > 0 && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "dz-chips", children: Array.from({ length: n }, (_, k) => /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("button", { type: "button", className: "dz-chip", onClick: () => delSample(i.id, k), "aria-label": `\u062D\u0630\u0641 \u0627\u0644\u0639\u064A\u0651\u0646\u0629 ${k + 1} \u0645\u0646 ${i.text}`, children: [
                 fmt(k + 1),
                 " \u2715"
               ] }, k)) })
             ] }, i.id);
           }),
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "dz-mic-note", children: "\u0627\u0644\u0623\u0630\u0643\u0627\u0631 \u0627\u0644\u0637\u0648\u064A\u0644\u0629 \u062C\u062F\u064B\u0627 \u0645\u0634 \u0645\u062F\u0639\u0648\u0645\u0629 \u0641\u064A \u0648\u0636\u0639 \u0628\u062F\u0648\u0646 \u0625\u0646\u062A\u0631\u0646\u062A." })
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "dz-mic-note", children: "\u0627\u0644\u0623\u0630\u0643\u0627\u0631 \u0627\u0644\u0637\u0648\u064A\u0644\u0629 \u062C\u062F\u064B\u0627 \u0645\u0634 \u0645\u062F\u0639\u0648\u0645\u0629 \u0641\u064A \u0648\u0636\u0639 \u0628\u062F\u0648\u0646 \u0625\u0646\u062A\u0631\u0646\u062A." })
         ] })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "dz-mic-fine", children: "\u062A\u062C\u0631\u064A\u0628\u064A. \u0645\u0645\u0643\u0646 \u064A\u063A\u0644\u0637 \u0641\u0631\u0627\u062C\u0639 \u0627\u0644\u0639\u062F\u0651\u0627\u062F. \u0627\u0644\u0648\u0636\u0639 \u0628\u0625\u0646\u062A\u0631\u0646\u062A \u0628\u064A\u0633\u062A\u062E\u062F\u0645 \u062E\u062F\u0645\u0629 \u0627\u0644\u062A\u0639\u0631\u0641 \u0639\u0644\u0649 \u0627\u0644\u0643\u0644\u0627\u0645 \u0628\u062A\u0627\u0639\u0629 \u0627\u0644\u0645\u062A\u0635\u0641\u062D\u060C \u0648\u0627\u0644\u0648\u0636\u0639 \u0628\u062F\u0648\u0646 \u0625\u0646\u062A\u0631\u0646\u062A \u0628\u064A\u0637\u0627\u0628\u0642 \u0635\u0648\u062A\u0643 \u0639\u0644\u0649 \u0627\u0644\u0644\u064A \u0633\u062C\u0644\u062A\u0647 \u062C\u0648\u0647 \u0627\u0644\u062C\u0647\u0627\u0632 \u0628\u0633." })
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "dz-mic-fine", children: "\u062A\u062C\u0631\u064A\u0628\u064A. \u0645\u0645\u0643\u0646 \u064A\u063A\u0644\u0637 \u0641\u0631\u0627\u062C\u0639 \u0627\u0644\u0639\u062F\u0651\u0627\u062F. \u0627\u0644\u0648\u0636\u0639 \u0628\u0625\u0646\u062A\u0631\u0646\u062A \u0628\u064A\u0633\u062A\u062E\u062F\u0645 \u062E\u062F\u0645\u0629 \u0627\u0644\u062A\u0639\u0631\u0641 \u0639\u0644\u0649 \u0627\u0644\u0643\u0644\u0627\u0645 \u0628\u062A\u0627\u0639\u0629 \u0627\u0644\u0645\u062A\u0635\u0641\u062D\u060C \u0648\u0627\u0644\u0648\u0636\u0639 \u0628\u062F\u0648\u0646 \u0625\u0646\u062A\u0631\u0646\u062A \u0628\u064A\u0637\u0627\u0628\u0642 \u0635\u0648\u062A\u0643 \u0639\u0644\u0649 \u0627\u0644\u0644\u064A \u0633\u062C\u0644\u062A\u0647 \u062C\u0648\u0647 \u0627\u0644\u062C\u0647\u0627\u0632 \u0628\u0633." })
     ] });
   }
   function PageListen({ items, label: label2 }) {
-    const [open, setOpen] = (0, import_react4.useState)(false);
+    const [open, setOpen] = (0, import_react5.useState)(false);
     const ps = usePlayer();
     const key = items.map((i) => i.id).join("|");
-    return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dz-pagelisten", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", { type: "button", className: ps.id === key || open ? "dz-undo dz-spk is-on" : "dz-undo dz-spk", onClick: () => setOpen(!open), "aria-label": label2, children: [
+    return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-pagelisten", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("button", { type: "button", className: ps.id === key || open ? "dz-undo dz-spk is-on" : "dz-undo dz-spk", onClick: () => setOpen(!open), "aria-label": label2, children: [
         "\u{1F50A} ",
         label2
       ] }),
-      open && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ListenPanel, { seq: items, onClose: () => setOpen(false) })
+      open && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(ListenPanel, { seq: items, onClose: () => setOpen(false) })
     ] });
   }
   var newId = () => "c" + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
@@ -17260,10 +18116,10 @@ Error generating stack: ` + i.message + `
     return { id: typeof x.id === "string" && /^c[a-z0-9]{3,30}$/.test(x.id) ? x.id : newId(), title, text, target: t >= 1 ? Math.min(t, 1e6) : void 0 };
   };
   function MinePage({ store, today, cu }) {
-    const [form, setForm] = (0, import_react4.useState)(null);
-    const [io2, setIo] = (0, import_react4.useState)("");
-    const [raw, setRaw] = (0, import_react4.useState)("");
-    const [msg, setMsg] = (0, import_react4.useState)("");
+    const [form, setForm] = (0, import_react5.useState)(null);
+    const [io2, setIo] = (0, import_react5.useState)("");
+    const [raw, setRaw] = (0, import_react5.useState)("");
+    const [msg, setMsg] = (0, import_react5.useState)("");
     const save2 = () => {
       if (!form) return;
       const c6 = cleanC({ id: form.id, title: form.title, text: form.text, target: form.target });
@@ -17304,64 +18160,64 @@ Error generating stack: ` + i.message + `
       }
     };
     const exportText = JSON.stringify({ dhikrCustom: 1, items: cu.list.map(({ title, text, target }) => ({ title, text, target })) }, null, 1);
-    return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Section, { title: "\u0625\u0636\u0627\u0641\u0627\u062A\u064A", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Paragraph, { children: "\u0623\u0636\u0641 \u0623\u064A \u0630\u0643\u0631 \u0623\u0648 \u062D\u062F\u064A\u062B \u0623\u0648 \u062F\u0639\u0627\u0621 \u0623\u0648 \u0622\u064A\u0629 \u0628\u0646\u0635\u0643\u060C \u0648\u0647\u062A\u0644\u0627\u0642\u064A\u0647 \u0639\u062F\u0651\u0627\u062F \u0632\u064A \u0627\u0644\u0628\u0627\u0642\u064A \u0648\u064A\u062F\u062E\u0644 \u0641\u064A \u0627\u0644\u0625\u062D\u0635\u0627\u0621\u0627\u062A \u0648\u0627\u0644\u0623\u0647\u062F\u0627\u0641." }),
-      cu.list.length === 0 && !form && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "dz-mic-note", children: "\u0644\u0633\u0647 \u0645\u0627 \u0623\u0636\u0641\u062A\u0634 \u062D\u0627\u062C\u0629." }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "dz-grid", children: cu.list.map((c6) => {
+    return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(Section, { title: "\u0625\u0636\u0627\u0641\u0627\u062A\u064A", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(Paragraph, { children: "\u0623\u0636\u0641 \u0623\u064A \u0630\u0643\u0631 \u0623\u0648 \u062D\u062F\u064A\u062B \u0623\u0648 \u062F\u0639\u0627\u0621 \u0623\u0648 \u0622\u064A\u0629 \u0628\u0646\u0635\u0643\u060C \u0648\u0647\u062A\u0644\u0627\u0642\u064A\u0647 \u0639\u062F\u0651\u0627\u062F \u0632\u064A \u0627\u0644\u0628\u0627\u0642\u064A \u0648\u064A\u062F\u062E\u0644 \u0641\u064A \u0627\u0644\u0625\u062D\u0635\u0627\u0621\u0627\u062A \u0648\u0627\u0644\u0623\u0647\u062F\u0627\u0641." }),
+      cu.list.length === 0 && !form && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "dz-mic-note", children: "\u0644\u0633\u0647 \u0645\u0627 \u0623\u0636\u0641\u062A\u0634 \u062D\u0627\u062C\u0629." }),
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "dz-grid", children: cu.list.map((c6) => {
         const n = today[c6.id] || 0;
-        return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dz-cu", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Tap, { item: { id: c6.id, text: c6.title }, count: n, disabled: !store.ready, onAdd: () => store.apply({ [c6.id]: 1 }), onUndo: () => store.apply({ [c6.id]: -1 }) }),
-          c6.text && c6.text !== c6.title && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "dz-cu-text", children: c6.text }),
-          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dz-cu-row", children: [
-            c6.target ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { className: n >= c6.target ? "dz-cu-t is-hit" : "dz-cu-t", children: [
+        return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-cu", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(Tap, { item: { id: c6.id, text: c6.title }, count: n, disabled: !store.ready, onAdd: () => store.apply({ [c6.id]: 1 }), onUndo: () => store.apply({ [c6.id]: -1 }) }),
+          c6.text && c6.text !== c6.title && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "dz-cu-text", children: c6.text }),
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-cu-row", children: [
+            c6.target ? /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { className: n >= c6.target ? "dz-cu-t is-hit" : "dz-cu-t", children: [
               n >= c6.target ? "\u2713 " : "",
               "\u0627\u0644\u0645\u0633\u062A\u0647\u062F\u0641: ",
               fmt(n),
               " \u0645\u0646 ",
               fmt(c6.target)
-            ] }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {}),
-            /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { children: [
-              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: "dz-mini", onClick: () => {
+            ] }) : /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", {}),
+            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { children: [
+              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: "dz-mini", onClick: () => {
                 setForm({ id: c6.id, title: c6.title, text: c6.text, target: c6.target ? String(c6.target) : "" });
                 setMsg("");
               }, children: "\u062A\u0639\u062F\u064A\u0644" }),
               " ",
-              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: "dz-mini", onClick: () => {
+              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: "dz-mini", onClick: () => {
                 if (confirm_(`\u062D\u0630\u0641 \xAB${c6.title}\xBB\u061F \u0627\u0644\u0639\u062F\u0651 \u0627\u0644\u0642\u062F\u064A\u0645 \u0647\u064A\u0641\u0636\u0644 \u0641\u064A \u0627\u0644\u0625\u062D\u0635\u0627\u0621\u0627\u062A.`)) del(c6.id);
               }, children: "\u062D\u0630\u0641" })
             ] })
           ] })
         ] }, c6.id);
       }) }),
-      form ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dz-cu-form", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("input", { className: "dz-in", placeholder: "\u0627\u0644\u0639\u0646\u0648\u0627\u0646 (\u0627\u062E\u062A\u064A\u0627\u0631\u064A)", value: form.title, maxLength: 200, onChange: (e6) => setForm({ ...form, title: e6.target.value }) }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("textarea", { className: "dz-in", placeholder: "\u0627\u0644\u0646\u0635", rows: 4, value: form.text, maxLength: 5e3, onChange: (e6) => setForm({ ...form, text: e6.target.value }) }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("input", { className: "dz-in", inputMode: "numeric", placeholder: "\u0627\u0644\u0639\u062F\u062F \u0627\u0644\u0645\u0633\u062A\u0647\u062F\u0641 \u064A\u0648\u0645\u064A\u064B\u0627 (\u0627\u062E\u062A\u064A\u0627\u0631\u064A)", value: form.target, onChange: (e6) => setForm({ ...form, target: e6.target.value.replace(/[^0-9]/g, "") }) }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dz-cu-row", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: "dz-mini dz-mini-pri", onClick: save2, children: form.id ? "\u062D\u0641\u0638 \u0627\u0644\u062A\u0639\u062F\u064A\u0644" : "\u0625\u0636\u0627\u0641\u0629" }),
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: "dz-mini", onClick: () => {
+      form ? /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-cu-form", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("input", { className: "dz-in", placeholder: "\u0627\u0644\u0639\u0646\u0648\u0627\u0646 (\u0627\u062E\u062A\u064A\u0627\u0631\u064A)", value: form.title, maxLength: 200, onChange: (e6) => setForm({ ...form, title: e6.target.value }) }),
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("textarea", { className: "dz-in", placeholder: "\u0627\u0644\u0646\u0635", rows: 4, value: form.text, maxLength: 5e3, onChange: (e6) => setForm({ ...form, text: e6.target.value }) }),
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("input", { className: "dz-in", inputMode: "numeric", placeholder: "\u0627\u0644\u0639\u062F\u062F \u0627\u0644\u0645\u0633\u062A\u0647\u062F\u0641 \u064A\u0648\u0645\u064A\u064B\u0627 (\u0627\u062E\u062A\u064A\u0627\u0631\u064A)", value: form.target, onChange: (e6) => setForm({ ...form, target: e6.target.value.replace(/[^0-9]/g, "") }) }),
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-cu-row", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: "dz-mini dz-mini-pri", onClick: save2, children: form.id ? "\u062D\u0641\u0638 \u0627\u0644\u062A\u0639\u062F\u064A\u0644" : "\u0625\u0636\u0627\u0641\u0629" }),
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: "dz-mini", onClick: () => {
             setForm(null);
             setMsg("");
           }, children: "\u0625\u0644\u063A\u0627\u0621" })
         ] })
-      ] }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: "dz-mini dz-mini-pri", disabled: !cu.ready, onClick: () => {
+      ] }) : /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: "dz-mini dz-mini-pri", disabled: !cu.ready, onClick: () => {
         setForm({ title: "", text: "", target: "" });
         setMsg("");
       }, children: "\uFF0B \u0625\u0636\u0627\u0641\u0629 \u062C\u062F\u064A\u062F\u0629" }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dz-cu-row", style: { marginTop: 10 }, children: [
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: "dz-mini", onClick: () => {
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-cu-row", style: { marginTop: 10 }, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: "dz-mini", onClick: () => {
           setIo(io2 === "out" ? "" : "out");
           setMsg("");
         }, children: "\u062A\u0635\u062F\u064A\u0631" }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: "dz-mini", onClick: () => {
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: "dz-mini", onClick: () => {
           setIo(io2 === "in" ? "" : "in");
           setMsg("");
         }, children: "\u0627\u0633\u062A\u064A\u0631\u0627\u062F" })
       ] }),
-      io2 === "out" && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dz-cu-form", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "dz-mic-note", children: "\u0627\u0646\u0633\u062E \u0627\u0644\u0646\u0635 \u062F\u0647 \u0648\u0627\u0628\u0639\u062A\u0647 \u0644\u0623\u064A \u062D\u062F\u060C \u0648\u0647\u0648 \u064A\u0644\u0635\u0642\u0647 \u0641\u064A \xAB\u0627\u0633\u062A\u064A\u0631\u0627\u062F\xBB." }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("textarea", { className: "dz-in", rows: 6, readOnly: true, value: exportText, onFocus: (e6) => e6.currentTarget.select() }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: "dz-mini", onClick: () => {
+      io2 === "out" && /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-cu-form", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "dz-mic-note", children: "\u0627\u0646\u0633\u062E \u0627\u0644\u0646\u0635 \u062F\u0647 \u0648\u0627\u0628\u0639\u062A\u0647 \u0644\u0623\u064A \u062D\u062F\u060C \u0648\u0647\u0648 \u064A\u0644\u0635\u0642\u0647 \u0641\u064A \xAB\u0627\u0633\u062A\u064A\u0631\u0627\u062F\xBB." }),
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("textarea", { className: "dz-in", rows: 6, readOnly: true, value: exportText, onFocus: (e6) => e6.currentTarget.select() }),
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: "dz-mini", onClick: () => {
           try {
             navigator.clipboard.writeText(exportText).then(() => setMsg("\u0627\u062A\u0646\u0633\u062E"), () => setMsg("\u062D\u062F\u062F \u0627\u0644\u0646\u0635 \u0648\u0627\u0646\u0633\u062E\u0647 \u064A\u062F\u0648\u064A\u064B\u0627"));
           } catch {
@@ -17369,11 +18225,11 @@ Error generating stack: ` + i.message + `
           }
         }, children: "\u0646\u0633\u062E" })
       ] }),
-      io2 === "in" && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dz-cu-form", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("textarea", { className: "dz-in", rows: 6, placeholder: "\u0627\u0644\u0635\u0642 \u0647\u0646\u0627 \u0627\u0644\u0646\u0635 \u0627\u0644\u0645\u0635\u062F\u0651\u0631", value: raw, onChange: (e6) => setRaw(e6.target.value) }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: "dz-mini dz-mini-pri", disabled: !raw.trim(), onClick: doImport, children: "\u0627\u0633\u062A\u064A\u0631\u0627\u062F" })
+      io2 === "in" && /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-cu-form", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("textarea", { className: "dz-in", rows: 6, placeholder: "\u0627\u0644\u0635\u0642 \u0647\u0646\u0627 \u0627\u0644\u0646\u0635 \u0627\u0644\u0645\u0635\u062F\u0651\u0631", value: raw, onChange: (e6) => setRaw(e6.target.value) }),
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: "dz-mini dz-mini-pri", disabled: !raw.trim(), onClick: doImport, children: "\u0627\u0633\u062A\u064A\u0631\u0627\u062F" })
       ] }),
-      msg && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "dz-mic-note", children: msg })
+      msg && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "dz-mic-note", children: msg })
     ] });
   }
   var confirm_ = (m) => {
@@ -17384,42 +18240,42 @@ Error generating stack: ` + i.message + `
     }
   };
   function CountPage({ store, today, chains, sub, cu }) {
-    return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [
-      sub === "mine" && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(MinePage, { store, today, cu }),
-      sub === "singles" && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)(PageListen, { items: SINGLES, label: "\u0627\u0633\u062A\u0645\u0639 \u0644\u0644\u0635\u0641\u062D\u0629 \u0643\u0644\u0647\u0627" }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Grid, { items: SINGLES, store, today })
+    return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(import_jsx_runtime2.Fragment, { children: [
+      sub === "mine" && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(MinePage, { store, today, cu }),
+      sub === "singles" && /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(import_jsx_runtime2.Fragment, { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(PageListen, { items: SINGLES, label: "\u0627\u0633\u062A\u0645\u0639 \u0644\u0644\u0635\u0641\u062D\u0629 \u0643\u0644\u0647\u0627" }),
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(Grid, { items: SINGLES, store, today })
       ] }),
-      sub === "q" && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Section, { title: "\u0627\u0644\u0628\u0627\u0642\u064A\u0627\u062A \u0627\u0644\u0635\u0627\u0644\u062D\u0627\u062A - \u062F\u0648\u0631\u0629 \u0643\u0627\u0645\u0644\u0629", children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ChainCounter, { cid: "q", items: SEQ, store, chains, today, cycleName: "\u062F\u0648\u0631\u0629" }) }),
-      sub === "pair" && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Section, { title: "\u0633\u064F\u0628\u062D\u0627\u0646 \u0627\u0644\u0644\u0647 \u0648\u0628\u062D\u0645\u062F\u0647 - \u0633\u064F\u0628\u062D\u0627\u0646 \u0627\u0644\u0644\u0647 \u0627\u0644\u0639\u0638\u064A\u0645 - \u062F\u0648\u0631\u0629 \u0643\u0627\u0645\u0644\u0629", children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ChainCounter, { cid: "t", items: PAIR, store, chains, today, cycleName: "\u062F\u0648\u0631\u0629" }) }),
-      sub === "istighfar" && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Section, { title: "\u0627\u0644\u0627\u0633\u062A\u063A\u0641\u0627\u0631", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)(PageListen, { items: ISTIGHFAR, label: "\u0627\u0633\u062A\u0645\u0639 \u0644\u0643\u0644 \u0627\u0644\u0627\u0633\u062A\u063A\u0641\u0627\u0631" }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Grid, { items: ISTIGHFAR, store, today })
+      sub === "q" && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(Section, { title: "\u0627\u0644\u0628\u0627\u0642\u064A\u0627\u062A \u0627\u0644\u0635\u0627\u0644\u062D\u0627\u062A - \u062F\u0648\u0631\u0629 \u0643\u0627\u0645\u0644\u0629", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(ChainCounter, { cid: "q", items: SEQ, store, chains, today, cycleName: "\u062F\u0648\u0631\u0629" }) }),
+      sub === "pair" && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(Section, { title: "\u0633\u064F\u0628\u062D\u0627\u0646 \u0627\u0644\u0644\u0647 \u0648\u0628\u062D\u0645\u062F\u0647 - \u0633\u064F\u0628\u062D\u0627\u0646 \u0627\u0644\u0644\u0647 \u0627\u0644\u0639\u0638\u064A\u0645 - \u062F\u0648\u0631\u0629 \u0643\u0627\u0645\u0644\u0629", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(ChainCounter, { cid: "t", items: PAIR, store, chains, today, cycleName: "\u062F\u0648\u0631\u0629" }) }),
+      sub === "istighfar" && /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(Section, { title: "\u0627\u0644\u0627\u0633\u062A\u063A\u0641\u0627\u0631", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(PageListen, { items: ISTIGHFAR, label: "\u0627\u0633\u062A\u0645\u0639 \u0644\u0643\u0644 \u0627\u0644\u0627\u0633\u062A\u063A\u0641\u0627\u0631" }),
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(Grid, { items: ISTIGHFAR, store, today })
       ] }),
-      sub === "salawat" && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Section, { title: "\u0627\u0644\u0635\u0644\u0627\u0629 \u0639\u0644\u0649 \u0627\u0644\u0646\u0628\u064A \uFDFA", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)(PageListen, { items: SALAWAT, label: "\u0627\u0633\u062A\u0645\u0639 \u0644\u0643\u0644 \u0627\u0644\u0635\u0644\u0627\u0629 \u0639\u0644\u0649 \u0627\u0644\u0646\u0628\u064A" }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Grid, { items: SALAWAT, store, today })
+      sub === "salawat" && /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(Section, { title: "\u0627\u0644\u0635\u0644\u0627\u0629 \u0639\u0644\u0649 \u0627\u0644\u0646\u0628\u064A \uFDFA", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(PageListen, { items: SALAWAT, label: "\u0627\u0633\u062A\u0645\u0639 \u0644\u0643\u0644 \u0627\u0644\u0635\u0644\u0627\u0629 \u0639\u0644\u0649 \u0627\u0644\u0646\u0628\u064A" }),
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(Grid, { items: SALAWAT, store, today })
       ] }),
-      sub === "ikhlas" && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Section, { title: "\u0633\u0648\u0631\u0629 \u0627\u0644\u0625\u062E\u0644\u0627\u0635", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dz-quran", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "dz-basmala", children: BASMALA }),
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { className: "dz-ayat", children: IKHLAS_TEXT })
+      sub === "ikhlas" && /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(Section, { title: "\u0633\u0648\u0631\u0629 \u0627\u0644\u0625\u062E\u0644\u0627\u0635", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-quran", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "dz-basmala", children: BASMALA }),
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { className: "dz-ayat", children: IKHLAS_TEXT })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Grid, { items: [IKHLAS], store, today })
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(Grid, { items: [IKHLAS], store, today })
       ] })
     ] });
   }
   function MultiPage({ store, today, chains, baseId, setBaseId }) {
     const base2 = BASES.find((b) => b.id === baseId);
-    return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Section, { title: "\u0627\u0644\u0630\u0643\u0631 \u0627\u0644\u0645\u0636\u0627\u0639\u0641", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dz-chips", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: baseId === "all" ? "dz-chip is-on" : "dz-chip", onClick: () => setBaseId("all"), children: "\u0643\u0644 \u0627\u0644\u0623\u0630\u0643\u0627\u0631 \u0645\u062C\u0645\u0639\u0629" }),
-        BASES.map((b) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", { type: "button", className: b.id === baseId ? "dz-chip is-on" : "dz-chip", onClick: () => setBaseId(b.id), children: [
+    return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(Section, { title: "\u0627\u0644\u0630\u0643\u0631 \u0627\u0644\u0645\u0636\u0627\u0639\u0641", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-chips", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: baseId === "all" ? "dz-chip is-on" : "dz-chip", onClick: () => setBaseId("all"), children: "\u0643\u0644 \u0627\u0644\u0623\u0630\u0643\u0627\u0631 \u0645\u062C\u0645\u0639\u0629" }),
+        BASES.map((b) => /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("button", { type: "button", className: b.id === baseId ? "dz-chip is-on" : "dz-chip", onClick: () => setBaseId(b.id), children: [
           b.text,
           sumPrefix(today, b.id + ".") > 0 ? ` (${fmt(sumPrefix(today, b.id + "."))})` : ""
         ] }, b.id))
       ] }),
-      base2 ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ChainCounter, { cid: base2.id, items: variants(base2), store, chains, today, cycleName: "\u062F\u0648\u0631\u0629" }, base2.id) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ChainCounter, { cid: "all", items: ALL_VARIANTS, group: 12, groupNames: BASES.map((b) => b.text), store, chains, today, cycleName: "\u0627\u0644\u062F\u0648\u0631\u0629 \u0627\u0644\u0643\u0627\u0645\u0644\u0629" }, "all")
+      base2 ? /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(ChainCounter, { cid: base2.id, items: variants(base2), store, chains, today, cycleName: "\u062F\u0648\u0631\u0629" }, base2.id) : /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(ChainCounter, { cid: "all", items: ALL_VARIANTS, group: 12, groupNames: BASES.map((b) => b.text), store, chains, today, cycleName: "\u0627\u0644\u062F\u0648\u0631\u0629 \u0627\u0644\u0643\u0627\u0645\u0644\u0629" }, "all")
     ] });
   }
   var REGULAR_SEQ = [...SINGLES, ...ISTIGHFAR, ...SALAWAT, IKHLAS];
@@ -17431,8 +18287,8 @@ Error generating stack: ` + i.message + `
   ];
   var mins = (sec) => sec < 90 ? `${fmt(Math.max(1, Math.round(sec)))} \u062B\u0627\u0646\u064A\u0629` : `${fmt(Math.round(sec / 60))} \u062F\u0642\u064A\u0642\u0629`;
   function ListenPage() {
-    const [pk, setPk] = (0, import_react4.useState)("all");
-    const [offs, setOffs] = (0, import_react4.useState)({});
+    const [pk, setPk] = (0, import_react5.useState)("all");
+    const [offs, setOffs] = (0, import_react5.useState)({});
     const prog = PROGRAMS.find((x) => x.k === pk) || PROGRAMS[0];
     const ps = usePlayer();
     const off = offs[prog.k] || [];
@@ -17443,31 +18299,31 @@ Error generating stack: ` + i.message + `
     const cur = mine ? { text: ps.text } : chosen[0] || prog.seq[0];
     const R6 = 54, C = 2 * Math.PI * R6;
     const frac = mine ? (ps.idx + 1) / Math.max(1, ps.len) : 0;
-    return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Section, { title: "\u0627\u062E\u062A\u0631 \u0645\u0627 \u062A\u0633\u0645\u0639\u0647", children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "dz-programs", children: PROGRAMS.map((x) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", { type: "button", className: (x.k === pk ? "dz-prog is-on" : "dz-prog") + (x.k === "full" ? " dz-prog-first" : ""), onClick: () => setPk(x.k), children: [
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "dz-prog-i", "aria-hidden": "true", children: x.icon }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "dz-prog-t", children: sig(x.title) }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "dz-prog-n", children: x.note }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { className: "dz-prog-d", children: [
+    return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(import_jsx_runtime2.Fragment, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(Section, { title: "\u0627\u062E\u062A\u0631 \u0645\u0627 \u062A\u0633\u0645\u0639\u0647", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "dz-programs", children: PROGRAMS.map((x) => /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("button", { type: "button", className: (x.k === pk ? "dz-prog is-on" : "dz-prog") + (x.k === "full" ? " dz-prog-first" : ""), onClick: () => setPk(x.k), children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "dz-prog-i", "aria-hidden": "true", children: x.icon }),
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "dz-prog-t", children: sig(x.title) }),
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "dz-prog-n", children: x.note }),
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { className: "dz-prog-d", children: [
           "\u0627\u0644\u062F\u0648\u0631\u0629 \u0627\u0644\u0648\u0627\u062D\u062F\u0629 \u062D\u0648\u0627\u0644\u064A ",
           mins(roundSeconds(x.seq))
         ] })
       ] }, x.k)) }) }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Section, { title: "\u0627\u0644\u0622\u0646", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dz-stage", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dz-ring", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("svg", { viewBox: "0 0 128 128", "aria-hidden": "true", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("circle", { cx: "64", cy: "64", r: R6, className: "dz-ring-bg" }),
-              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("circle", { cx: "64", cy: "64", r: R6, className: "dz-ring-fg", strokeDasharray: C, strokeDashoffset: C * (1 - frac) })
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(Section, { title: "\u0627\u0644\u0622\u0646", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-stage", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-ring", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("svg", { viewBox: "0 0 128 128", "aria-hidden": "true", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("circle", { cx: "64", cy: "64", r: R6, className: "dz-ring-bg" }),
+              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("circle", { cx: "64", cy: "64", r: R6, className: "dz-ring-fg", strokeDasharray: C, strokeDashoffset: C * (1 - frac) })
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "dz-ring-n", children: mine ? fmt(ps.idx + 1) : "\u{1F50A}" })
+            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "dz-ring-n", children: mine ? fmt(ps.idx + 1) : "\u{1F50A}" })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "dz-stage-t", children: sig(cur.text) }),
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "dz-stage-s", children: mine ? `\u0627\u0644\u0630\u0643\u0631 ${fmt(ps.idx + 1)} \u0645\u0646 ${fmt(ps.len)}` : `${fmt(chosen.length)} \u0645\u0646 ${fmt(prog.seq.length)} \u0630\u0643\u0631 \u0641\u064A \u0627\u0644\u062F\u0648\u0631\u0629` })
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "dz-stage-t", children: sig(cur.text) }),
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "dz-stage-s", children: mine ? `\u0627\u0644\u0630\u0643\u0631 ${fmt(ps.idx + 1)} \u0645\u0646 ${fmt(ps.len)}` : `${fmt(chosen.length)} \u0645\u0646 ${fmt(prog.seq.length)} \u0630\u0643\u0631 \u0641\u064A \u0627\u0644\u062F\u0648\u0631\u0629` })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ListenPanel, { seq: prog.seq, off, setOff }, prog.k)
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(ListenPanel, { seq: prog.seq, off, setOff }, prog.k)
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Section, { title: "\u0645\u062D\u062A\u0648\u0649 \u0627\u0644\u062F\u0648\u0631\u0629 (\u0639\u0644\u0651\u0645 \u0639\u0644\u0649 \u0645\u0627 \u062A\u0631\u064A\u062F \u0633\u0645\u0627\u0639\u0647)", children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Picker, { seq: prog.seq, off, setOff, cur: mine ? ps.text : void 0 }) })
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(Section, { title: "\u0645\u062D\u062A\u0648\u0649 \u0627\u0644\u062F\u0648\u0631\u0629 (\u0639\u0644\u0651\u0645 \u0639\u0644\u0649 \u0645\u0627 \u062A\u0631\u064A\u062F \u0633\u0645\u0627\u0639\u0647)", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(Picker, { seq: prog.seq, off, setOff, cur: mine ? ps.text : void 0 }) })
     ] });
   }
   var dayTotal = (c6) => c6 ? Object.values(c6).reduce((a, b) => a + b, 0) : 0;
@@ -17514,22 +18370,22 @@ Error generating stack: ` + i.message + `
   }
   function JourneyCard({ store, start, setStart }) {
     const j3 = journey(store.daily, start);
-    const [edit, setEdit] = (0, import_react4.useState)(false);
-    return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Section, { title: "\u0631\u062D\u0644\u062A\u0643", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Rows, { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Row, { name: "\u0628\u062F\u0623\u062A \u064A\u0648\u0645", detail: `\u0623\u0646\u062A \u0645\u0633\u062A\u0645\u0631 \u0645\u0646\u0630 ${fmt(j3.days)} ${j3.days === 1 ? "\u064A\u0648\u0645" : "\u064A\u0648\u0645"}`, value: j3.startFmt, valueKnown: true }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Row, { name: "\u0623\u064A\u0627\u0645 \u0645\u062A\u062A\u0627\u0644\u064A\u0629 \u0628\u062F\u0648\u0646 \u0627\u0646\u0642\u0637\u0627\u0639", detail: `\u0623\u0637\u0648\u0644 \u0633\u0644\u0633\u0644\u0629: ${fmt(j3.best)}`, value: fmt(j3.cur), valueKnown: j3.cur > 0 })
+    const [edit, setEdit] = (0, import_react5.useState)(false);
+    return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(Section, { title: "\u0631\u062D\u0644\u062A\u0643", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(Rows, { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(Row, { name: "\u0628\u062F\u0623\u062A \u064A\u0648\u0645", detail: `\u0623\u0646\u062A \u0645\u0633\u062A\u0645\u0631 \u0645\u0646\u0630 ${fmt(j3.days)} ${j3.days === 1 ? "\u064A\u0648\u0645" : "\u064A\u0648\u0645"}`, value: j3.startFmt, valueKnown: true }),
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(Row, { name: "\u0623\u064A\u0627\u0645 \u0645\u062A\u062A\u0627\u0644\u064A\u0629 \u0628\u062F\u0648\u0646 \u0627\u0646\u0642\u0637\u0627\u0639", detail: `\u0623\u0637\u0648\u0644 \u0633\u0644\u0633\u0644\u0629: ${fmt(j3.best)}`, value: fmt(j3.cur), valueKnown: j3.cur > 0 })
       ] }),
-      j3.insight && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "dz-insight", children: j3.insight }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "dz-start-edit", children: edit ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("label", { children: [
+      j3.insight && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "dz-insight", children: j3.insight }),
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "dz-start-edit", children: edit ? /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(import_jsx_runtime2.Fragment, { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("label", { children: [
           "\u062A\u0627\u0631\u064A\u062E \u0627\u0644\u0628\u062F\u0627\u064A\u0629 ",
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("input", { type: "date", value: j3.start, max: keyOf(/* @__PURE__ */ new Date()), onChange: (e6) => {
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("input", { type: "date", value: j3.start, max: keyOf(/* @__PURE__ */ new Date()), onChange: (e6) => {
             if (e6.target.value) setStart(e6.target.value);
           } })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { className: "dz-mini", onClick: () => setEdit(false), children: "\u062A\u0645\u0651" })
-      ] }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { className: "dz-mini", onClick: () => setEdit(true), children: "\u062A\u0639\u062F\u064A\u0644 \u062A\u0627\u0631\u064A\u062E \u0627\u0644\u0628\u062F\u0627\u064A\u0629" }) })
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { className: "dz-mini", onClick: () => setEdit(false), children: "\u062A\u0645\u0651" })
+      ] }) : /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { className: "dz-mini", onClick: () => setEdit(true), children: "\u062A\u0639\u062F\u064A\u0644 \u062A\u0627\u0631\u064A\u062E \u0627\u0644\u0628\u062F\u0627\u064A\u0629" }) })
     ] });
   }
   function StatsPage({ store, start, setStart, hist }) {
@@ -17547,16 +18403,16 @@ Error generating stack: ` + i.message + `
     ];
     const allTop = topOf(p.all);
     const bars = Object.entries(p.all).sort((a, b) => b[1] - a[1]).slice(0, 8);
-    return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime.jsx)(JourneyCard, { store, start, setStart }),
-      hist.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Section, { title: "\u062C\u0644\u0633\u0627\u062A \u0627\u0644\u0645\u064A\u0643\u0631\u0648\u0641\u0648\u0646", children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Rows, { children: hist.slice(0, 10).map((h) => {
+    return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(import_jsx_runtime2.Fragment, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(JourneyCard, { store, start, setStart }),
+      hist.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(Section, { title: "\u062C\u0644\u0633\u0627\u062A \u0627\u0644\u0645\u064A\u0643\u0631\u0648\u0641\u0648\u0646", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(Rows, { children: hist.slice(0, 10).map((h) => {
         const d = new Date(h.at);
         const top = Object.entries(h.by).sort((a, b) => b[1] - a[1]).slice(0, 2).map(([id2, n]) => `${TEXT[id2] || id2}: ${fmt(n)}`).join(" \xB7 ");
-        return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Row, { name: `${pad(d.getDate())}-${pad(d.getMonth() + 1)} ${pad(d.getHours())}:${pad(d.getMinutes())}`, detail: `${mmss2(h.secs * 1e3)}${top ? " \xB7 " + top : ""}`, value: fmt(h.total), valueKnown: h.total > 0 }, h.at);
+        return /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(Row, { name: `${pad(d.getDate())}-${pad(d.getMonth() + 1)} ${pad(d.getHours())}:${pad(d.getMinutes())}`, detail: `${mmss2(h.secs * 1e3)}${top ? " \xB7 " + top : ""}`, value: fmt(h.total), valueKnown: h.total > 0 }, h.at);
       }) }) }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Section, { title: "\u0643\u0645 \u0645\u0631\u0629 \u0630\u0643\u0631\u062A \u0627\u0644\u0644\u0647", children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Rows, { children: periods.map((x) => {
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(Section, { title: "\u0643\u0645 \u0645\u0631\u0629 \u0630\u0643\u0631\u062A \u0627\u0644\u0644\u0647", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(Rows, { children: periods.map((x) => {
         const t = topOf(x.c);
-        return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
+        return /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
           Row,
           {
             name: x.label,
@@ -17567,27 +18423,27 @@ Error generating stack: ` + i.message + `
           x.label
         );
       }) }) }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Section, { title: "\u0643\u0644 \u0630\u0643\u0631 \u0641\u064A \u0643\u0644 \u0641\u062A\u0631\u0629", children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dz-table", role: "table", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dz-tr dz-th", role: "row", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { role: "columnheader", children: "\u0627\u0644\u0630\u0643\u0631" }),
-          periods.map((x) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { role: "columnheader", children: x.label }, x.label))
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(Section, { title: "\u0643\u0644 \u0630\u0643\u0631 \u0641\u064A \u0643\u0644 \u0641\u062A\u0631\u0629", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-table", role: "table", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-tr dz-th", role: "row", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { role: "columnheader", children: "\u0627\u0644\u0630\u0643\u0631" }),
+          periods.map((x) => /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { role: "columnheader", children: x.label }, x.label))
         ] }),
-        rows.map((r) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dz-tr", role: "row", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { role: "cell", className: "dz-td-name", children: r.label }),
-          periods.map((x) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { role: "cell", children: fmt(r.get(x.c)) }, x.label))
+        rows.map((r) => /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-tr", role: "row", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { role: "cell", className: "dz-td-name", children: r.label }),
+          periods.map((x) => /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { role: "cell", children: fmt(r.get(x.c)) }, x.label))
         ] }, r.label))
       ] }) }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Section, { title: "\u0623\u0643\u062B\u0631 \u0630\u0643\u0631 \u0642\u0644\u062A\u0647", children: allTop ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dz-best", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: TEXT[allTop] }),
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("strong", { children: fmt(p.all[allTop]) })
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(Section, { title: "\u0623\u0643\u062B\u0631 \u0630\u0643\u0631 \u0642\u0644\u062A\u0647", children: allTop ? /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(import_jsx_runtime2.Fragment, { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-best", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { children: TEXT[allTop] }),
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("strong", { children: fmt(p.all[allTop]) })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "dz-bars", children: bars.map(([id2, n]) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dz-bar", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "dz-bar-label", children: TEXT[id2] }),
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "dz-bar-track", children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "dz-bar-fill", style: { width: `${n / p.all[allTop] * 100}%` } }) }),
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "dz-bar-n", children: fmt(n) })
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "dz-bars", children: bars.map(([id2, n]) => /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-bar", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "dz-bar-label", children: TEXT[id2] }),
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "dz-bar-track", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "dz-bar-fill", style: { width: `${n / p.all[allTop] * 100}%` } }) }),
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "dz-bar-n", children: fmt(n) })
         ] }, id2)) })
-      ] }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Paragraph, { children: "\u0627\u0628\u062F\u0623 \u0627\u0644\u0639\u062F \u0648\u0647\u062A\u0638\u0647\u0631 \u0647\u0646\u0627 \u0627\u0644\u0623\u0630\u0643\u0627\u0631 \u0645\u0631\u062A\u0628\u0629 \u0645\u0646 \u0627\u0644\u0623\u0643\u062B\u0631 \u0644\u0644\u0623\u0642\u0644." }) })
+      ] }) : /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(Paragraph, { children: "\u0627\u0628\u062F\u0623 \u0627\u0644\u0639\u062F \u0648\u0647\u062A\u0638\u0647\u0631 \u0647\u0646\u0627 \u0627\u0644\u0623\u0630\u0643\u0627\u0631 \u0645\u0631\u062A\u0628\u0629 \u0645\u0646 \u0627\u0644\u0623\u0643\u062B\u0631 \u0644\u0644\u0623\u0642\u0644." }) })
     ] });
   }
   var UI0 = { mode: "light", skin: "emerald", font: "default", scale: 1, bold: false, vib: true, vol: 1 };
@@ -17682,100 +18538,100 @@ Error generating stack: ` + i.message + `
   }
   function DimSlider({ ui, setUi, id: id2 }) {
     const v = Math.min(70, Math.max(0, Math.round(ui.dim || 0)));
-    return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dz-dim", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("label", { htmlFor: id2, children: [
+    return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-dim", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("label", { htmlFor: id2, children: [
         "\u{1F505} \u062A\u0642\u0644\u064A\u0644 \u0627\u0644\u0625\u0636\u0627\u0621\u0629 ",
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("b", { children: v === 0 ? "\u0645\u0642\u0641\u0648\u0644" : fmt(v) + "%" })
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("b", { children: v === 0 ? "\u0645\u0642\u0641\u0648\u0644" : fmt(v) + "%" })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("input", { id: id2, type: "range", min: 0, max: 70, step: 1, value: v, onChange: (e6) => setUi({ ...ui, dim: Number(e6.target.value) }), "aria-label": "\u062A\u0642\u0644\u064A\u0644 \u0627\u0644\u0625\u0636\u0627\u0621\u0629" }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dz-dim-row", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "\u0623\u0641\u062A\u062D" }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "\u0623\u063A\u0645\u0642" })
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("input", { id: id2, type: "range", min: 0, max: 70, step: 1, value: v, onChange: (e6) => setUi({ ...ui, dim: Number(e6.target.value) }), "aria-label": "\u062A\u0642\u0644\u064A\u0644 \u0627\u0644\u0625\u0636\u0627\u0621\u0629" }),
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-dim-row", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { children: "\u0623\u0641\u062A\u062D" }),
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { children: "\u0623\u063A\u0645\u0642" })
       ] })
     ] });
   }
   function DimLayer({ dim }) {
     const v = Math.min(70, Math.max(0, dim || 0));
-    return v > 0 ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "dz-dimlayer", style: { background: `rgba(0,0,0,${v / 100})` }, "aria-hidden": "true" }) : null;
+    return v > 0 ? /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "dz-dimlayer", style: { background: `rgba(0,0,0,${v / 100})` }, "aria-hidden": "true" }) : null;
   }
   function DimQuick({ ui, setUi }) {
-    const [open, setOpen] = (0, import_react4.useState)(false);
-    return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dz-dimquick", children: [
-      open && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dz-dimpop", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)(DimSlider, { ui, setUi, id: "dz-dim-q" }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: "dz-undo", onClick: () => setOpen(false), children: "\u062A\u0645" })
+    const [open, setOpen] = (0, import_react5.useState)(false);
+    return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-dimquick", children: [
+      open && /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-dimpop", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(DimSlider, { ui, setUi, id: "dz-dim-q" }),
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: "dz-undo", onClick: () => setOpen(false), children: "\u062A\u0645" })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: "dz-dimfab", onClick: () => setOpen(!open), "aria-label": "\u062A\u0642\u0644\u064A\u0644 \u0627\u0644\u0625\u0636\u0627\u0621\u0629", "aria-expanded": open, children: "\u{1F505}" })
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: "dz-dimfab", onClick: () => setOpen(!open), "aria-label": "\u062A\u0642\u0644\u064A\u0644 \u0627\u0644\u0625\u0636\u0627\u0621\u0629", "aria-expanded": open, children: "\u{1F505}" })
     ] });
   }
   function Look({ ui, setUi, goals, setGoals, streak, backup, store }) {
     const si = Math.max(0, SCALES.indexOf(ui.scale));
-    return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Section, { title: "\u0627\u0644\u0648\u0636\u0639", children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dz-trio", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: ui.mode === "calm" ? "dz-opt is-on" : "dz-opt", onClick: () => setUi({ ...ui, mode: "calm" }), children: "\u{1F319} \u0647\u0627\u062F\u0626" }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: ui.mode === "light" ? "dz-opt is-on" : "dz-opt", onClick: () => setUi({ ...ui, mode: "light" }), children: "\u2600 \u0645\u0636\u064A\u0621" }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: ui.mode === "dark" ? "dz-opt is-on" : "dz-opt", onClick: () => setUi({ ...ui, mode: "dark" }), children: "\u263E \u0644\u064A\u0644\u064A" })
+    return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(import_jsx_runtime2.Fragment, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(Section, { title: "\u0627\u0644\u0648\u0636\u0639", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-trio", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: ui.mode === "calm" ? "dz-opt is-on" : "dz-opt", onClick: () => setUi({ ...ui, mode: "calm" }), children: "\u{1F319} \u0647\u0627\u062F\u0626" }),
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: ui.mode === "light" ? "dz-opt is-on" : "dz-opt", onClick: () => setUi({ ...ui, mode: "light" }), children: "\u2600 \u0645\u0636\u064A\u0621" }),
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: ui.mode === "dark" ? "dz-opt is-on" : "dz-opt", onClick: () => setUi({ ...ui, mode: "dark" }), children: "\u263E \u0644\u064A\u0644\u064A" })
       ] }) }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Section, { title: "\u062A\u0642\u0644\u064A\u0644 \u0627\u0644\u0625\u0636\u0627\u0621\u0629", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)(DimSlider, { ui, setUi, id: "dz-dim-s" }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { className: "dz-dim-note", children: "\u0637\u0628\u0642\u0629 \u0646\u0627\u0639\u0645\u0629 \u062A\u063A\u0645\u0651\u0642 \u0627\u0644\u0634\u0627\u0634\u0629\u060C \u0645\u0646 \u063A\u064A\u0631 \u0645\u0627 \u062A\u0623\u062B\u0631 \u0639\u0644\u0649 \u0627\u0644\u0639\u062F. \u0628\u062A\u0634\u062A\u063A\u0644 \u0641\u064A \u0627\u0644\u0648\u0636\u0639 \u0627\u0644\u0645\u0636\u064A\u0621 \u0648\u0627\u0644\u0644\u064A\u0644\u064A \u0648\u0627\u0644\u0647\u0627\u062F\u0626." })
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(Section, { title: "\u062A\u0642\u0644\u064A\u0644 \u0627\u0644\u0625\u0636\u0627\u0621\u0629", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(DimSlider, { ui, setUi, id: "dz-dim-s" }),
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { className: "dz-dim-note", children: "\u0637\u0628\u0642\u0629 \u0646\u0627\u0639\u0645\u0629 \u062A\u063A\u0645\u0651\u0642 \u0627\u0644\u0634\u0627\u0634\u0629\u060C \u0645\u0646 \u063A\u064A\u0631 \u0645\u0627 \u062A\u0623\u062B\u0631 \u0639\u0644\u0649 \u0627\u0644\u0639\u062F. \u0628\u062A\u0634\u062A\u063A\u0644 \u0641\u064A \u0627\u0644\u0648\u0636\u0639 \u0627\u0644\u0645\u0636\u064A\u0621 \u0648\u0627\u0644\u0644\u064A\u0644\u064A \u0648\u0627\u0644\u0647\u0627\u062F\u0626." })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Section, { title: "\u0627\u0644\u062B\u064A\u0645", children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "dz-skins", children: SKINS.map((k) => {
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(Section, { title: "\u0627\u0644\u062B\u064A\u0645", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "dz-skins", children: SKINS.map((k) => {
         const p = ui.mode !== "light" ? k.dark : k.light;
-        return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", { type: "button", className: ui.skin === k.id ? "dz-skin is-on" : "dz-skin", onClick: () => setUi({ ...ui, skin: k.id }), "aria-label": `\u062B\u064A\u0645 ${k.name}`, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "dz-swatch", style: { background: `linear-gradient(135deg, ${p.h1}, ${p.h2})`, borderColor: p.gold }, children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("i", { style: { background: p.heroAcc } }) }),
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: k.name })
+        return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("button", { type: "button", className: ui.skin === k.id ? "dz-skin is-on" : "dz-skin", onClick: () => setUi({ ...ui, skin: k.id }), "aria-label": `\u062B\u064A\u0645 ${k.name}`, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "dz-swatch", style: { background: `linear-gradient(135deg, ${p.h1}, ${p.h2})`, borderColor: p.gold }, children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("i", { style: { background: p.heroAcc } }) }),
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { children: k.name })
         ] }, k.id);
       }) }) }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Section, { title: "\u0627\u0644\u062E\u0637", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "dz-chips", children: FONTS.map((f) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: `${ui.font === f.id ? "dz-chip is-on" : "dz-chip"} dz-fc-${f.id}`, onClick: () => setUi({ ...ui, font: f.id }), children: f.name }, f.id)) }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "dz-sample", children: "\u0633\u064F\u0628\u062D\u0627\u0646 \u0627\u0644\u0644\u0647 \u0648\u0627\u0644\u062D\u0645\u062F\u064F \u0644\u0644\u0647 \u0648\u0644\u0627 \u0625\u0644\u0647 \u0625\u0644\u0627 \u0627\u0644\u0644\u0647 \u0648\u0627\u0644\u0644\u0647\u064F \u0623\u0643\u0628\u0631" })
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(Section, { title: "\u0627\u0644\u062E\u0637", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "dz-chips", children: FONTS.map((f) => /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: `${ui.font === f.id ? "dz-chip is-on" : "dz-chip"} dz-fc-${f.id}`, onClick: () => setUi({ ...ui, font: f.id }), children: f.name }, f.id)) }),
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "dz-sample", children: "\u0633\u064F\u0628\u062D\u0627\u0646 \u0627\u0644\u0644\u0647 \u0648\u0627\u0644\u062D\u0645\u062F\u064F \u0644\u0644\u0647 \u0648\u0644\u0627 \u0625\u0644\u0647 \u0625\u0644\u0627 \u0627\u0644\u0644\u0647 \u0648\u0627\u0644\u0644\u0647\u064F \u0623\u0643\u0628\u0631" })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Section, { title: "\u062D\u062C\u0645 \u0627\u0644\u062E\u0637", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dz-size", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: "dz-opt", disabled: si === 0, onClick: () => setUi({ ...ui, scale: SCALES[si - 1] }), "aria-label": "\u062A\u0635\u063A\u064A\u0631 \u0627\u0644\u062E\u0637", children: "\u0623 \u2212" }),
-          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { className: "dz-size-n", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(Section, { title: "\u062D\u062C\u0645 \u0627\u0644\u062E\u0637", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-size", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: "dz-opt", disabled: si === 0, onClick: () => setUi({ ...ui, scale: SCALES[si - 1] }), "aria-label": "\u062A\u0635\u063A\u064A\u0631 \u0627\u0644\u062E\u0637", children: "\u0623 \u2212" }),
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { className: "dz-size-n", children: [
             fmt(Math.round(ui.scale * 100)),
             "%"
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: "dz-opt", disabled: si === SCALES.length - 1, onClick: () => setUi({ ...ui, scale: SCALES[si + 1] }), "aria-label": "\u062A\u0643\u0628\u064A\u0631 \u0627\u0644\u062E\u0637", children: "\u0623 +" })
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: "dz-opt", disabled: si === SCALES.length - 1, onClick: () => setUi({ ...ui, scale: SCALES[si + 1] }), "aria-label": "\u062A\u0643\u0628\u064A\u0631 \u0627\u0644\u062E\u0637", children: "\u0623 +" })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dz-pair", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: ui.bold ? "dz-opt is-on" : "dz-opt", onClick: () => setUi({ ...ui, bold: true }), children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("b", { children: "\u0639\u0631\u064A\u0636" }) }),
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: !ui.bold ? "dz-opt is-on" : "dz-opt", onClick: () => setUi({ ...ui, bold: false }), children: "\u0625\u0644\u063A\u0627\u0621 \u0627\u0644\u0639\u0631\u064A\u0636" })
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-pair", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: ui.bold ? "dz-opt is-on" : "dz-opt", onClick: () => setUi({ ...ui, bold: true }), children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("b", { children: "\u0639\u0631\u064A\u0636" }) }),
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: !ui.bold ? "dz-opt is-on" : "dz-opt", onClick: () => setUi({ ...ui, bold: false }), children: "\u0625\u0644\u063A\u0627\u0621 \u0627\u0644\u0639\u0631\u064A\u0636" })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: "dz-undo", onClick: () => setUi({ ...UI0, dim: ui.dim, gper: ui.gper, gbase: ui.gbase, gsnd: ui.gsnd, gvol: ui.gvol }), children: "\u0625\u0639\u0627\u062F\u0629 \u0627\u0644\u0636\u0628\u0637 \u0627\u0644\u0627\u0641\u062A\u0631\u0627\u0636\u064A" })
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: "dz-undo", onClick: () => setUi({ ...UI0, dim: ui.dim, gper: ui.gper, gbase: ui.gbase, gsnd: ui.gsnd, gvol: ui.gvol }), children: "\u0625\u0639\u0627\u062F\u0629 \u0627\u0644\u0636\u0628\u0637 \u0627\u0644\u0627\u0641\u062A\u0631\u0627\u0636\u064A" })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Section, { title: "\u0627\u0644\u0627\u0647\u062A\u0632\u0627\u0632", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dz-pair", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: ui.vib ? "dz-opt is-on" : "dz-opt", onClick: () => setUi({ ...ui, vib: true }), children: "\u062A\u0634\u063A\u064A\u0644" }),
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: !ui.vib ? "dz-opt is-on" : "dz-opt", onClick: () => setUi({ ...ui, vib: false }), children: "\u0625\u064A\u0642\u0627\u0641" })
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(Section, { title: "\u0627\u0644\u0627\u0647\u062A\u0632\u0627\u0632", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-pair", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: ui.vib ? "dz-opt is-on" : "dz-opt", onClick: () => setUi({ ...ui, vib: true }), children: "\u062A\u0634\u063A\u064A\u0644" }),
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: !ui.vib ? "dz-opt is-on" : "dz-opt", onClick: () => setUi({ ...ui, vib: false }), children: "\u0625\u064A\u0642\u0627\u0641" })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Paragraph, { children: "\u0627\u0647\u062A\u0632\u0627\u0632 \u062E\u0641\u064A\u0641 \u0645\u0639 \u0643\u0644 \u0639\u062F\u0651\u0629\u060C \u0648\u0627\u0647\u062A\u0632\u0627\u0632 \u0623\u0648\u0636\u062D \u0639\u0646\u062F \u0646\u0647\u0627\u064A\u0629 \u0627\u0644\u062F\u0648\u0631\u0629 \u0648\u0648\u0635\u0648\u0644 \u0627\u0644\u0647\u062F\u0641. \u0628\u0639\u0636 \u0627\u0644\u0623\u062C\u0647\u0632\u0629 \u0644\u0627 \u062A\u062F\u0639\u0645\u0647." })
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(Paragraph, { children: "\u0627\u0647\u062A\u0632\u0627\u0632 \u062E\u0641\u064A\u0641 \u0645\u0639 \u0643\u0644 \u0639\u062F\u0651\u0629\u060C \u0648\u0627\u0647\u062A\u0632\u0627\u0632 \u0623\u0648\u0636\u062D \u0639\u0646\u062F \u0646\u0647\u0627\u064A\u0629 \u0627\u0644\u062F\u0648\u0631\u0629 \u0648\u0648\u0635\u0648\u0644 \u0627\u0644\u0647\u062F\u0641. \u0628\u0639\u0636 \u0627\u0644\u0623\u062C\u0647\u0632\u0629 \u0644\u0627 \u062A\u062F\u0639\u0645\u0647." })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsx)(GoalsEditor, { goals, setGoals, store }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Section, { title: "\u0633\u0644\u0633\u0644\u0629 \u0627\u0644\u0623\u064A\u0627\u0645", children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dz-best", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "\u0623\u0637\u0648\u0644 \u0633\u0644\u0633\u0644\u0629" }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("strong", { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(GoalsEditor, { goals, setGoals, store }),
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(Section, { title: "\u0633\u0644\u0633\u0644\u0629 \u0627\u0644\u0623\u064A\u0627\u0645", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-best", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { children: "\u0623\u0637\u0648\u0644 \u0633\u0644\u0633\u0644\u0629" }),
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("strong", { children: [
           fmt(streak.best),
           " \u064A\u0648\u0645"
         ] })
       ] }) }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsx)(BackupBox, { backup })
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(BackupBox, { backup })
     ] });
   }
   function NavBars({ tab, setTab, sub, setSub, where }) {
     const tabs = [["count", "\u0627\u0644\u0639\u062F\u0627\u062F"], ["multi", "\u0627\u0644\u0630\u0643\u0631 \u0627\u0644\u0645\u0636\u0627\u0639\u0641"], ["listen", "\u0627\u0633\u062A\u0645\u0639 \u0644\u0644\u0623\u0630\u0643\u0627\u0631"], ["stats", "\u0627\u0644\u0625\u062D\u0635\u0627\u0621\u0627\u062A"], ["look", "\u0627\u0644\u0645\u0638\u0647\u0631 \u0648\u0627\u0644\u0625\u0639\u062F\u0627\u062F\u0627\u062A"]];
-    return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("nav", { className: `dz-nav dz-nav-${where}`, "aria-label": "\u0627\u0644\u0623\u0642\u0633\u0627\u0645", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "dz-tabs", role: "tablist", children: tabs.map(([k, label2]) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", role: "tab", "aria-selected": tab === k, className: tab === k ? "dz-tab is-on" : "dz-tab", onClick: () => setTab(k), children: label2 }, k)) }),
-      tab === "count" && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "dz-subs", children: SUBS.map(([k, label2]) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: sub === k ? "dz-sub is-on" : "dz-sub", onClick: () => setSub(k), children: sig(label2) }, k)) })
+    return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("nav", { className: `dz-nav dz-nav-${where}`, "aria-label": "\u0627\u0644\u0623\u0642\u0633\u0627\u0645", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "dz-tabs", role: "tablist", children: tabs.map(([k, label2]) => /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", role: "tab", "aria-selected": tab === k, className: tab === k ? "dz-tab is-on" : "dz-tab", onClick: () => setTab(k), children: label2 }, k)) }),
+      tab === "count" && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "dz-subs", children: SUBS.map(([k, label2]) => /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: sub === k ? "dz-sub is-on" : "dz-sub", onClick: () => setSub(k), children: sig(label2) }, k)) })
     ] });
   }
   var GOAL_ITEMS = [...SINGLES, ...ISTIGHFAR, ...SALAWAT, IKHLAS];
   var GOAL_BASE_N = GOAL_ITEMS.length;
   function GoalsEditor({ goals, setGoals, store }) {
-    const [step, setStep] = (0, import_react4.useState)(10);
-    const uc2 = import_react4.default.useContext(UiCtx);
+    const [step, setStep] = (0, import_react5.useState)(10);
+    const uc2 = import_react5.default.useContext(UiCtx);
     const ui = uc2?.ui;
     const per = ui?.gper || "day";
     const upd = (p) => {
@@ -17794,41 +18650,41 @@ Error generating stack: ` + i.message + `
       upd({ gbase: { ...ui?.gbase || {}, [id2]: { pk, v: cur } } });
     };
     const snd = ui?.gsnd || "chime", gv = typeof ui?.gvol === "number" ? ui.gvol : 0.5;
-    return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Section, { title: "\u0627\u0644\u0623\u0647\u062F\u0627\u0641", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Paragraph, { children: "\u062D\u062F\u062F \u0647\u062F\u0641\u064B\u0627 \u0644\u0623\u064A \u0630\u0643\u0631. \u0644\u0645\u0627 \u062A\u0648\u0635\u0644\u0647 \u0627\u0644\u0643\u0627\u0631\u062A \u0628\u064A\u0644\u0645\u0639 \u0628\u0644\u0648\u0646 \u0645\u0645\u064A\u0632 \u0648\u0628\u064A\u0637\u0644\u0639 \u0635\u0648\u062A \u0646\u0642\u0631\u0629 \u0642\u0635\u064A\u0631. \u0635\u0641\u0631 \u0645\u0639\u0646\u0627\u0647 \u0628\u062F\u0648\u0646 \u0647\u062F\u0641." }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "dz-goalhead", children: "\u064A\u062A\u0635\u0641\u0651\u0631 \u0627\u0644\u0647\u062F\u0641:" }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "dz-chips", children: PERIODS.map(([k, n]) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: per === k ? "dz-chip is-on" : "dz-chip", onClick: () => upd({ gper: k }), children: n }, k)) }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "dz-mic-note", children: per === "day" ? "\u0643\u0644 \u064A\u0648\u0645 \u0645\u0646 \u0623\u0648\u0644 \u0627\u0644\u064A\u0648\u0645." : per === "week" ? "\u0643\u0644 \u0623\u0633\u0628\u0648\u0639 \u064A\u0628\u062F\u0623 \u0645\u0646 \u0627\u0644\u0633\u0628\u062A." : per === "month" ? "\u0643\u0644 \u0634\u0647\u0631 \u0645\u0646 \u0623\u0648\u0644 \u0627\u0644\u0634\u0647\u0631." : "\u0645\u0627 \u0628\u064A\u062A\u0635\u0641\u0651\u0631 \u0644\u0648\u062D\u062F\u0647\u060C \u062A\u0635\u0641\u0651\u0631\u0647 \u0628\u0646\u0641\u0633\u0643 \u0645\u0646 \u0632\u0631 \xAB\u062A\u0635\u0641\u064A\u0631\xBB \u062C\u0646\u0628 \u0643\u0644 \u0630\u0643\u0631." }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "dz-chips", children: [1, 10, 100].map((n) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", { type: "button", className: step === n ? "dz-chip is-on" : "dz-chip", onClick: () => setStep(n), children: [
+    return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(Section, { title: "\u0627\u0644\u0623\u0647\u062F\u0627\u0641", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(Paragraph, { children: "\u062D\u062F\u062F \u0647\u062F\u0641\u064B\u0627 \u0644\u0623\u064A \u0630\u0643\u0631. \u0644\u0645\u0627 \u062A\u0648\u0635\u0644\u0647 \u0627\u0644\u0643\u0627\u0631\u062A \u0628\u064A\u0644\u0645\u0639 \u0628\u0644\u0648\u0646 \u0645\u0645\u064A\u0632 \u0648\u0628\u064A\u0637\u0644\u0639 \u0635\u0648\u062A \u0646\u0642\u0631\u0629 \u0642\u0635\u064A\u0631. \u0635\u0641\u0631 \u0645\u0639\u0646\u0627\u0647 \u0628\u062F\u0648\u0646 \u0647\u062F\u0641." }),
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "dz-goalhead", children: "\u064A\u062A\u0635\u0641\u0651\u0631 \u0627\u0644\u0647\u062F\u0641:" }),
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "dz-chips", children: PERIODS.map(([k, n]) => /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: per === k ? "dz-chip is-on" : "dz-chip", onClick: () => upd({ gper: k }), children: n }, k)) }),
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "dz-mic-note", children: per === "day" ? "\u0643\u0644 \u064A\u0648\u0645 \u0645\u0646 \u0623\u0648\u0644 \u0627\u0644\u064A\u0648\u0645." : per === "week" ? "\u0643\u0644 \u0623\u0633\u0628\u0648\u0639 \u064A\u0628\u062F\u0623 \u0645\u0646 \u0627\u0644\u0633\u0628\u062A." : per === "month" ? "\u0643\u0644 \u0634\u0647\u0631 \u0645\u0646 \u0623\u0648\u0644 \u0627\u0644\u0634\u0647\u0631." : "\u0645\u0627 \u0628\u064A\u062A\u0635\u0641\u0651\u0631 \u0644\u0648\u062D\u062F\u0647\u060C \u062A\u0635\u0641\u0651\u0631\u0647 \u0628\u0646\u0641\u0633\u0643 \u0645\u0646 \u0632\u0631 \xAB\u062A\u0635\u0641\u064A\u0631\xBB \u062C\u0646\u0628 \u0643\u0644 \u0630\u0643\u0631." }),
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "dz-chips", children: [1, 10, 100].map((n) => /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("button", { type: "button", className: step === n ? "dz-chip is-on" : "dz-chip", onClick: () => setStep(n), children: [
         "\u0627\u0644\u062E\u0637\u0648\u0629 ",
         fmt(n)
       ] }, n)) }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "dz-goals", children: GOAL_ITEMS.map((i) => {
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "dz-goals", children: GOAL_ITEMS.map((i) => {
         const g = goals[i.id] || 0;
         const d = g ? progressOf(store, per, ui?.gbase, i.id) : 0;
-        return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dz-goal2", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dz-goal", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "dz-goal-name", children: sig(i.text) }),
-            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: "dz-undo", onClick: () => change(i.id, -step), "aria-label": `\u0625\u0646\u0642\u0627\u0635 \u0647\u062F\u0641 ${i.text}`, children: "\u2212" }),
-            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "dz-goal-n", children: g ? fmt(g) : "\u0628\u062F\u0648\u0646" }),
-            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: "dz-undo", onClick: () => change(i.id, step), "aria-label": `\u0632\u064A\u0627\u062F\u0629 \u0647\u062F\u0641 ${i.text}`, children: "+" })
+        return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-goal2", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-goal", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "dz-goal-name", children: sig(i.text) }),
+            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: "dz-undo", onClick: () => change(i.id, -step), "aria-label": `\u0625\u0646\u0642\u0627\u0635 \u0647\u062F\u0641 ${i.text}`, children: "\u2212" }),
+            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "dz-goal-n", children: g ? fmt(g) : "\u0628\u062F\u0648\u0646" }),
+            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: "dz-undo", onClick: () => change(i.id, step), "aria-label": `\u0632\u064A\u0627\u062F\u0629 \u0647\u062F\u0641 ${i.text}`, children: "+" })
           ] }),
-          g > 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dz-goalprog", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "dz-gbar", children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("i", { style: { width: Math.min(100, Math.round(d * 100 / g)) + "%" } }) }),
-            /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { className: "dz-goal-pn", children: [
+          g > 0 && /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-goalprog", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "dz-gbar", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("i", { style: { width: Math.min(100, Math.round(d * 100 / g)) + "%" } }) }),
+            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { className: "dz-goal-pn", children: [
               fmt(d),
               " \u0645\u0646 ",
               fmt(g),
               d >= g ? " \u2713" : ""
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: "dz-chip", onClick: () => reset(i.id), children: "\u062A\u0635\u0641\u064A\u0631" })
+            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: "dz-chip", onClick: () => reset(i.id), children: "\u062A\u0635\u0641\u064A\u0631" })
           ] })
         ] }, i.id);
       }) }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "dz-goalhead", children: "\u0635\u0648\u062A \u0627\u0644\u0648\u0635\u0648\u0644 \u0644\u0644\u0647\u062F\u0641" }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dz-chips", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: snd === "none" ? "dz-chip is-on" : "dz-chip", onClick: () => upd({ gsnd: "none" }), children: "\u0628\u062F\u0648\u0646 \u0635\u0648\u062A" }),
-        CLICKS.map((c6) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", { type: "button", className: snd === c6.id ? "dz-chip is-on" : "dz-chip", onClick: () => {
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "dz-goalhead", children: "\u0635\u0648\u062A \u0627\u0644\u0648\u0635\u0648\u0644 \u0644\u0644\u0647\u062F\u0641" }),
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-chips", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: snd === "none" ? "dz-chip is-on" : "dz-chip", onClick: () => upd({ gsnd: "none" }), children: "\u0628\u062F\u0648\u0646 \u0635\u0648\u062A" }),
+        CLICKS.map((c6) => /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("button", { type: "button", className: snd === c6.id ? "dz-chip is-on" : "dz-chip", onClick: () => {
           upd({ gsnd: c6.id });
           playClick(c6.id, gv);
         }, children: [
@@ -17836,77 +18692,78 @@ Error generating stack: ` + i.message + `
           c6.name
         ] }, c6.id))
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dz-dim", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("label", { htmlFor: "dz-gvol", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-dim", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("label", { htmlFor: "dz-gvol", children: [
           "\u0645\u0633\u062A\u0648\u0649 \u0627\u0644\u0635\u0648\u062A ",
-          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("b", { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("b", { children: [
             fmt(Math.round(gv * 100)),
             "%"
           ] })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("input", { id: "dz-gvol", type: "range", min: 0, max: 100, step: 5, value: Math.round(gv * 100), onChange: (e6) => upd({ gvol: Number(e6.target.value) / 100 }), onPointerUp: () => playClick(snd, gv), "aria-label": "\u0645\u0633\u062A\u0648\u0649 \u0635\u0648\u062A \u0627\u0644\u0647\u062F\u0641" })
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("input", { id: "dz-gvol", type: "range", min: 0, max: 100, step: 5, value: Math.round(gv * 100), onChange: (e6) => upd({ gvol: Number(e6.target.value) / 100 }), onPointerUp: () => playClick(snd, gv), "aria-label": "\u0645\u0633\u062A\u0648\u0649 \u0635\u0648\u062A \u0627\u0644\u0647\u062F\u0641" })
       ] })
     ] });
   }
   function BackupBox({ backup }) {
-    const [out, setOut] = (0, import_react4.useState)("");
-    const [inp, setInp] = (0, import_react4.useState)("");
-    const [ask, setAsk] = (0, import_react4.useState)(false);
-    const [msg, setMsg] = (0, import_react4.useState)("");
-    return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Section, { title: "\u0646\u0633\u062E\u0629 \u0627\u062D\u062A\u064A\u0627\u0637\u064A\u0629 \u0644\u0644\u0625\u062D\u0635\u0627\u0621\u0627\u062A", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "dz-mic-note", children: "\u0627\u0644\u0646\u0633\u062E\u0629 \u062F\u064A \u0628\u062A\u0634\u0645\u0644 \u0627\u0644\u0639\u062F\u0651 \u0648\u0627\u0644\u0625\u062D\u0635\u0627\u0621\u0627\u062A \u0648\u0627\u0644\u0623\u0647\u062F\u0627\u0641 \u0648\u0627\u0644\u0645\u0638\u0647\u0631 \u0648\u062A\u0627\u0631\u064A\u062E \u0627\u0644\u0628\u062F\u0627\u064A\u0629 \u0648\u0625\u0636\u0627\u0641\u0627\u062A\u064A. (\u0633\u062C\u0644 \u062C\u0644\u0633\u0627\u062A \u0627\u0644\u0645\u064A\u0643\u0631\u0648\u0641\u0648\u0646 \u0645\u0634 \u062F\u0627\u062E\u0644 \u0641\u064A\u0647\u0627.)" }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Paragraph, { children: "\u062A\u0635\u062F\u064A\u0631: \u0627\u0636\u063A\u0637 \u062A\u062C\u0647\u064A\u0632 \u062B\u0645 \u0627\u0646\u0633\u062E \u0627\u0644\u0646\u0635 \u0648\u0627\u062D\u0641\u0638\u0647 \u0641\u064A \u0645\u0643\u0627\u0646 \u0622\u0645\u0646 (\u0645\u0644\u0627\u062D\u0638\u0627\u062A \u0623\u0648 \u0631\u0633\u0627\u0644\u0629 \u0644\u0646\u0641\u0633\u0643). \u0627\u0633\u062A\u064A\u0631\u0627\u062F: \u0627\u0644\u0635\u0642 \u0627\u0644\u0646\u0635 \u0647\u0646\u0627. \u0627\u0644\u0627\u0633\u062A\u064A\u0631\u0627\u062F \u064A\u0633\u062A\u0628\u062F\u0644 \u0643\u0644 \u0628\u064A\u0627\u0646\u0627\u062A \u0647\u0630\u0627 \u0627\u0644\u062C\u0647\u0627\u0632." }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: "dz-opt", onClick: () => {
+    const [out, setOut] = (0, import_react5.useState)("");
+    const [inp, setInp] = (0, import_react5.useState)("");
+    const [ask, setAsk] = (0, import_react5.useState)(false);
+    const [msg, setMsg] = (0, import_react5.useState)("");
+    return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(Section, { title: "\u0646\u0633\u062E\u0629 \u0627\u062D\u062A\u064A\u0627\u0637\u064A\u0629 \u0644\u0644\u0625\u062D\u0635\u0627\u0621\u0627\u062A", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "dz-mic-note", children: "\u0627\u0644\u0646\u0633\u062E\u0629 \u062F\u064A \u0628\u062A\u0634\u0645\u0644 \u0627\u0644\u0639\u062F\u0651 \u0648\u0627\u0644\u0625\u062D\u0635\u0627\u0621\u0627\u062A \u0648\u0627\u0644\u0623\u0647\u062F\u0627\u0641 \u0648\u0627\u0644\u0645\u0638\u0647\u0631 \u0648\u062A\u0627\u0631\u064A\u062E \u0627\u0644\u0628\u062F\u0627\u064A\u0629 \u0648\u0625\u0636\u0627\u0641\u0627\u062A\u064A. (\u0633\u062C\u0644 \u062C\u0644\u0633\u0627\u062A \u0627\u0644\u0645\u064A\u0643\u0631\u0648\u0641\u0648\u0646 \u0645\u0634 \u062F\u0627\u062E\u0644 \u0641\u064A\u0647\u0627.)" }),
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(Paragraph, { children: "\u062A\u0635\u062F\u064A\u0631: \u0627\u0636\u063A\u0637 \u062A\u062C\u0647\u064A\u0632 \u062B\u0645 \u0627\u0646\u0633\u062E \u0627\u0644\u0646\u0635 \u0648\u0627\u062D\u0641\u0638\u0647 \u0641\u064A \u0645\u0643\u0627\u0646 \u0622\u0645\u0646 (\u0645\u0644\u0627\u062D\u0638\u0627\u062A \u0623\u0648 \u0631\u0633\u0627\u0644\u0629 \u0644\u0646\u0641\u0633\u0643). \u0627\u0633\u062A\u064A\u0631\u0627\u062F: \u0627\u0644\u0635\u0642 \u0627\u0644\u0646\u0635 \u0647\u0646\u0627. \u0627\u0644\u0627\u0633\u062A\u064A\u0631\u0627\u062F \u064A\u0633\u062A\u0628\u062F\u0644 \u0643\u0644 \u0628\u064A\u0627\u0646\u0627\u062A \u0647\u0630\u0627 \u0627\u0644\u062C\u0647\u0627\u0632." }),
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: "dz-opt", onClick: () => {
         setOut(backup.make());
         setMsg("");
       }, children: "\u062A\u062C\u0647\u064A\u0632 \u0627\u0644\u0646\u0633\u062E\u0629 \u0644\u0644\u062A\u0635\u062F\u064A\u0631" }),
-      out && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("textarea", { className: "dz-ta", readOnly: true, value: out, rows: 4, "aria-label": "\u0646\u0635 \u0627\u0644\u0646\u0633\u062E\u0629 \u0627\u0644\u0627\u062D\u062A\u064A\u0627\u0637\u064A\u0629" }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CopyButton, { text: out })
+      out && /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(import_jsx_runtime2.Fragment, { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("textarea", { className: "dz-ta", readOnly: true, value: out, rows: 4, "aria-label": "\u0646\u0635 \u0627\u0644\u0646\u0633\u062E\u0629 \u0627\u0644\u0627\u062D\u062A\u064A\u0627\u0637\u064A\u0629" }),
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(CopyButton, { text: out })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("textarea", { className: "dz-ta", value: inp, onChange: (e6) => {
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("textarea", { className: "dz-ta", value: inp, onChange: (e6) => {
         setInp(e6.target.value);
         setAsk(false);
         setMsg("");
       }, rows: 4, placeholder: "\u0627\u0644\u0635\u0642 \u0627\u0644\u0646\u0633\u062E\u0629 \u0627\u0644\u0627\u062D\u062A\u064A\u0627\u0637\u064A\u0629 \u0647\u0646\u0627 \u0644\u0644\u0627\u0633\u062A\u064A\u0631\u0627\u062F", "aria-label": "\u0644\u0635\u0642 \u0646\u0633\u062E\u0629 \u0627\u062D\u062A\u064A\u0627\u0637\u064A\u0629" }),
-      !ask ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: "dz-undo", disabled: !inp.trim(), onClick: () => setAsk(true), children: "\u0627\u0633\u062A\u064A\u0631\u0627\u062F" }) : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dz-pair", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: "dz-undo dz-stop", onClick: () => {
+      !ask ? /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: "dz-undo", disabled: !inp.trim(), onClick: () => setAsk(true), children: "\u0627\u0633\u062A\u064A\u0631\u0627\u062F" }) : /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-pair", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: "dz-undo dz-stop", onClick: () => {
           setMsg(backup.load(inp));
           setAsk(false);
         }, children: "\u062A\u0623\u0643\u064A\u062F: \u0627\u0633\u062A\u0628\u062F\u0627\u0644 \u0627\u0644\u0628\u064A\u0627\u0646\u0627\u062A" }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: "dz-undo", onClick: () => setAsk(false), children: "\u0625\u0644\u063A\u0627\u0621" })
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: "dz-undo", onClick: () => setAsk(false), children: "\u0625\u0644\u063A\u0627\u0621" })
       ] }),
-      msg && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "dz-status", children: msg })
+      msg && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "dz-status", children: msg })
     ] });
   }
   function NowPlaying({ onSettings }) {
     const ps = usePlayer();
-    const uc2 = import_react4.default.useContext(UiCtx);
+    const uc2 = import_react5.default.useContext(UiCtx);
     const ambOn2 = !!uc2?.ui.ambm;
     if (!ps.id) return null;
-    return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dz-now", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { className: "dz-now-t", children: [
+    return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-now", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { className: "dz-now-t", children: [
         "\u{1F50A} ",
         ps.text.length > 40 ? ps.text.slice(0, 40) + "\u2026" : ps.text,
         ps.len > 1 ? ` (${fmt(ps.idx + 1)}/${fmt(ps.len)})` : "",
         " \xB7 ",
         ps.times ? `${fmt(ps.n)}/${fmt(ps.times)}` : ps.endAt ? mmss(ps.left) : fmt(ps.n)
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: "dz-undo", onClick: onSettings, children: "\u2699 \u0625\u0639\u062F\u0627\u062F\u0627\u062A \u0627\u0644\u0635\u0648\u062A" }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: "dz-undo", onClick: () => {
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: "dz-undo", onClick: onSettings, children: "\u2699 \u0625\u0639\u062F\u0627\u062F\u0627\u062A \u0627\u0644\u0635\u0648\u062A" }),
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: "dz-undo", onClick: () => {
         unlockAudio();
         if (uc2) uc2.update({ ...uc2.ui, ambm: !ambOn2 });
       }, "aria-pressed": ambOn2, children: ambOn2 ? "\u{1F507} \u0643\u062A\u0645 \u0623\u0635\u0648\u0627\u062A \u0627\u0644\u062E\u0644\u0641\u064A\u0629" : "\u{1F33F} \u062A\u0634\u063A\u064A\u0644 \u0623\u0635\u0648\u0627\u062A \u0627\u0644\u062E\u0644\u0641\u064A\u0629" }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: "dz-undo", onClick: togglePause, children: ps.paused ? "\u0627\u0633\u062A\u0645\u0631\u0627\u0631" : "\u0625\u064A\u0642\u0627\u0641 \u0645\u0624\u0642\u062A" }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: "dz-undo", onClick: stop, children: "\u25A0 \u0625\u0646\u0647\u0627\u0621" })
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: "dz-undo", onClick: togglePause, children: ps.paused ? "\u0627\u0633\u062A\u0645\u0631\u0627\u0631" : "\u0625\u064A\u0642\u0627\u0641 \u0645\u0624\u0642\u062A" }),
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: "dz-undo", onClick: stop, children: "\u25A0 \u0625\u0646\u0647\u0627\u0621" })
     ] });
   }
+  var IS_BAR_PAGE = typeof location !== "undefined" && /[?&]bar=1/.test(location.search);
   function App() {
     const store = useStore();
     const chains = useChains();
-    const [tab, setTab] = (0, import_react4.useState)("count");
-    const [sub, setSub] = (0, import_react4.useState)("singles");
-    const [baseId, setBaseId] = (0, import_react4.useState)("all");
+    const [tab, setTab] = (0, import_react5.useState)("count");
+    const [sub, setSub] = (0, import_react5.useState)("singles");
+    const [baseId, setBaseId] = (0, import_react5.useState)("all");
     const [ui, setUi, savedUi] = useLocalState("dz.ui.v1", UI0);
     const [goals, setGoals, savedGoals] = useLocalState("dz.goals.v1", {});
     const [custom, setCustom, savedCustom] = useLocalState("dz.custom.v1", []);
@@ -17918,7 +18775,7 @@ Error generating stack: ` + i.message + `
     const [hist, setHist, savedHist] = useLocalState("dz.sess.v1", []);
     const micA = useMic().on, micB = useOff().on;
     const micOn = micA || micB;
-    (0, import_react4.useEffect)(() => {
+    (0, import_react5.useEffect)(() => {
       if (micOn && !SES.on) sesSet({ on: true, start: Date.now(), end: 0, total: 0, by: {} });
       else if (!micOn && SES.on) {
         const end = Date.now();
@@ -17933,9 +18790,10 @@ Error generating stack: ` + i.message + `
     };
     const [streak, setStreak, savedStreak] = useLocalState("dz.streak.v1", { last: "", cur: 0, best: 0 });
     const [last, setLast, savedLast] = useLocalState("dz.last.v1", { tab: "count", sub: "singles", base: "all" });
-    const [touched, setTouched] = (0, import_react4.useState)(false);
-    const [notice, setNotice] = (0, import_react4.useState)("");
-    const reached = (0, import_react4.useRef)(null);
+    const [touched, setTouched] = (0, import_react5.useState)(false);
+    const [notice, setNotice] = (0, import_react5.useState)("");
+    const [bar, setBar] = (0, import_react5.useState)(false);
+    const reached = (0, import_react5.useRef)(null);
     const merged = { ...UI0, ...ui };
     setMicMulti(tab === "multi");
     VOICE.fn = (id2, n) => {
@@ -17944,7 +18802,7 @@ Error generating stack: ` + i.message + `
       if (VOICE.sink && VOICE.sink(id2, n)) return;
       store.apply({ [id2]: n }, "mic");
     };
-    (0, import_react4.useEffect)(() => {
+    (0, import_react5.useEffect)(() => {
       applyUi(merged);
     }, [ui]);
     const p = periodCounts(store);
@@ -17955,7 +18813,7 @@ Error generating stack: ` + i.message + `
     const todayKey = keyOf(/* @__PURE__ */ new Date());
     const gper = merged.gper || "day";
     const progFn = (id2) => progressOf(store, gper, merged.gbase, id2);
-    (0, import_react4.useEffect)(() => {
+    (0, import_react5.useEffect)(() => {
       if (!store.ready || !savedGoals.ready || !savedUi.ready) return;
       const pk = periodKey(gper, /* @__PURE__ */ new Date());
       const nowReached = new Set(GOAL_ITEMS.filter((i) => goals[i.id] && progFn(i.id) >= goals[i.id]).map((i) => `${pk}:${i.id}:${goals[i.id]}`));
@@ -17973,13 +18831,13 @@ Error generating stack: ` + i.message + `
       }
       reached.current = nowReached;
     }, [store.daily, store.rest, goals, gper, merged.gbase, store.ready, savedGoals.ready, savedUi.ready]);
-    (0, import_react4.useEffect)(() => {
+    (0, import_react5.useEffect)(() => {
       if (!notice) return;
       const t = setTimeout(() => setNotice(""), 9e3);
       return () => clearTimeout(t);
     }, [notice]);
     const yesterdayKey = keyOf(new Date(Date.now() - 864e5));
-    (0, import_react4.useEffect)(() => {
+    (0, import_react5.useEffect)(() => {
       if (!store.ready || !savedStreak.ready || total(p.today) === 0 || streak.last === todayKey) return;
       const cur = streak.last === yesterdayKey ? streak.cur + 1 : 1;
       setStreak({ last: todayKey, cur, best: Math.max(streak.best, cur) });
@@ -18019,63 +18877,88 @@ Error generating stack: ` + i.message + `
         }
       }
     };
-    return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(UiCtx.Provider, { value: { ui: merged, update }, children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(GoalCtx.Provider, { value: goals, children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(GoalInfoCtx.Provider, { value: { prog: progFn, label: { day: "\u0627\u0644\u064A\u0648\u0645", week: "\u0627\u0644\u0623\u0633\u0628\u0648\u0639", month: "\u0627\u0644\u0634\u0647\u0631", manual: "\u0645\u0646 \u0627\u0644\u062A\u0635\u0641\u064A\u0631" }[gper] }, children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(FileCard, { lang: "ar", dir: "rtl", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dz-hero", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: "dz-theme", disabled: !savedUi.ready, onClick: () => update({ ...merged, mode: calmOrDark ? "light" : "dark" }), "aria-label": calmOrDark ? "\u0627\u0644\u062A\u0628\u062F\u064A\u0644 \u0625\u0644\u0649 \u0627\u0644\u0648\u0636\u0639 \u0627\u0644\u0645\u0636\u064A\u0621" : "\u0627\u0644\u062A\u0628\u062F\u064A\u0644 \u0625\u0644\u0649 \u0627\u0644\u0648\u0636\u0639 \u0627\u0644\u0644\u064A\u0644\u064A", children: calmOrDark ? "\u2600 \u0645\u0636\u064A\u0621" : "\u263E \u0644\u064A\u0644\u064A" }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h1", { className: "dz-title", children: "\u0639\u062F\u0627\u062F \u0627\u0644\u0623\u0630\u0643\u0627\u0631" }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dz-today", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("strong", { children: fmt(total(p.today)) }),
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "\u0630\u0643\u0631\u062A \u0627\u0644\u0644\u0647 \u0627\u0644\u064A\u0648\u0645" })
+    const [webBar, setWebBar] = (0, import_react5.useState)(false);
+    if (IS_BAR_PAGE) return /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(BarPage, { cuList, onExit: () => {
+    } });
+    return /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(UiCtx.Provider, { value: { ui: merged, update }, children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(GoalCtx.Provider, { value: goals, children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(GoalInfoCtx.Provider, { value: { prog: progFn, label: { day: "\u0627\u0644\u064A\u0648\u0645", week: "\u0627\u0644\u0623\u0633\u0628\u0648\u0639", month: "\u0627\u0644\u0634\u0647\u0631", manual: "\u0645\u0646 \u0627\u0644\u062A\u0635\u0641\u064A\u0631" }[gper] }, children: /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(FileCard, { lang: "ar", dir: "rtl", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-hero", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: "dz-theme", disabled: !savedUi.ready, onClick: () => update({ ...merged, mode: calmOrDark ? "light" : "dark" }), "aria-label": calmOrDark ? "\u0627\u0644\u062A\u0628\u062F\u064A\u0644 \u0625\u0644\u0649 \u0627\u0644\u0648\u0636\u0639 \u0627\u0644\u0645\u0636\u064A\u0621" : "\u0627\u0644\u062A\u0628\u062F\u064A\u0644 \u0625\u0644\u0649 \u0627\u0644\u0648\u0636\u0639 \u0627\u0644\u0644\u064A\u0644\u064A", children: calmOrDark ? "\u2600 \u0645\u0636\u064A\u0621" : "\u263E \u0644\u064A\u0644\u064A" }),
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("h1", { className: "dz-title", children: "\u0639\u062F\u0627\u062F \u0627\u0644\u0623\u0630\u0643\u0627\u0631" }),
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-today", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("strong", { children: fmt(total(p.today)) }),
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { children: "\u0630\u0643\u0631\u062A \u0627\u0644\u0644\u0647 \u0627\u0644\u064A\u0648\u0645" })
         ] }),
         (() => {
           const j3 = journey(store.daily, startD);
-          return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dz-streak", children: [
+          return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-streak", children: [
             j3.cur > 0 ? `\u{1F525} ${j3.cur === 1 ? "\u064A\u0648\u0645 \u0645\u062A\u062A\u0627\u0644\u064A" : `${fmt(j3.cur)} \u0623\u064A\u0627\u0645 \u0645\u062A\u062A\u0627\u0644\u064A\u0629`} \xB7 ` : "",
             "\u0645\u0633\u062A\u0645\u0631 \u0645\u0646\u0630 ",
             fmt(j3.days),
             " \u064A\u0648\u0645"
           ] });
-        })()
+        })(),
+        !barAvailable() && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "dz-baropen-row", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("button", { type: "button", className: "dz-baropen", onClick: () => setWebBar((v) => !v), children: [
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { "aria-hidden": "true", style: { fontSize: 22 }, children: "\u{1F4CC}" }),
+          webBar ? "\u0625\u062E\u0641\u0627\u0621 \u0627\u0644\u0634\u0631\u064A\u0637 \u0627\u0644\u0639\u0627\u0626\u0645" : "\u0627\u0644\u0634\u0631\u064A\u0637 \u0627\u0644\u0639\u0627\u0626\u0645"
+        ] }) }),
+        !barAvailable() && pipSupported() && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "dz-baropen-row", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("button", { type: "button", className: "dz-baropen", onClick: () => {
+          setWebBar(false);
+          void openBarPip(() => {
+          });
+        }, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { "aria-hidden": "true", style: { fontSize: 22 }, children: "\u{1FA9F}" }),
+          "\u0627\u0644\u0634\u0631\u064A\u0637 \u062E\u0627\u0631\u062C \u0627\u0644\u0645\u062A\u0635\u0641\u062D (\u0641\u0648\u0642 \u0643\u0644 \u0627\u0644\u0646\u0648\u0627\u0641\u0630)"
+        ] }) }),
+        webBar && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(WebBarHost, { onClose: () => setWebBar(false) }),
+        barAvailable() && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "dz-baropen-row", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("button", { type: "button", className: "dz-baropen", onClick: () => {
+          try {
+            window.dhikrBar("open", "{}");
+          } catch {
+          }
+        }, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { "aria-hidden": "true", style: { fontSize: 22 }, children: "\u{1F4CC}" }),
+          "\u0627\u0644\u0634\u0631\u064A\u0637 \u0627\u0644\u0645\u062B\u0628\u0651\u062A (\u0646\u0627\u0641\u0630\u0629 \u0645\u0646\u0641\u0635\u0644\u0629)"
+        ] }) })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsx)(NavBars, { tab, setTab: setTabX, sub, setSub: setSubX, where: "top" }),
-      showResume && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dz-now", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { className: "dz-now-t", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(NavBars, { tab, setTab: setTabX, sub, setSub: setSubX, where: "top" }),
+      showResume && /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-now", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { className: "dz-now-t", children: [
           "\u0643\u0645\u0651\u0644 \u0645\u0646 \u062D\u064A\u062B \u0648\u0642\u0641\u062A: ",
           where(last)
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: "dz-undo dz-playgo", onClick: () => go2(last.tab, last.sub, last.base), children: "\u0643\u0645\u0651\u0644" })
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: "dz-undo dz-playgo", onClick: () => go2(last.tab, last.sub, last.base), children: "\u0643\u0645\u0651\u0644" })
       ] }),
-      notice && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dz-now dz-goalnote", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "dz-now-t", children: notice }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: "dz-undo", onClick: () => setNotice(""), children: "\u0625\u063A\u0644\u0627\u0642" })
+      notice && /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-now dz-goalnote", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "dz-now-t", children: notice }),
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", className: "dz-undo", onClick: () => setNotice(""), children: "\u0625\u063A\u0644\u0627\u0642" })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsx)(DimLayer, { dim: merged.dim || 0 }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsx)(DimQuick, { ui: merged, setUi }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsx)(NowPlaying, { onSettings: () => {
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(DimLayer, { dim: merged.dim || 0 }),
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(DimQuick, { ui: merged, setUi }),
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(NowPlaying, { onSettings: () => {
         requestAudioFocus();
         setTabX("listen");
       } }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "dz-body", children: [
-        !store.ready && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Callout, { title: "\u062C\u0627\u0631\u064A \u0627\u0644\u062A\u062D\u0645\u064A\u0644", tone: "note", children: "\u062B\u0648\u0627\u0646\u064A \u0648\u064A\u0638\u0647\u0631 \u0639\u062F\u0651\u0643 \u0627\u0644\u0645\u062D\u0641\u0648\u0638." }),
-        store.message && store.ready && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Callout, { title: "\u062A\u0646\u0628\u064A\u0647 \u0627\u0644\u062D\u0641\u0638", tone: "warning", children: store.message }),
-        (tab === "count" || tab === "multi") && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(MicBar, { store }),
-        tab !== "count" && tab !== "multi" && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(MicStrip, {}),
-        tab === "count" && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CountPage, { store, today: p.today, chains, sub, cu: cuApi }),
-        tab === "multi" && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(MultiPage, { store, today: p.today, chains, baseId, setBaseId: setBaseX }),
-        tab === "listen" && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ListenPage, {}),
-        tab === "stats" && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(StatsPage, { store, start: startD, setStart: setStartD, hist: Array.isArray(hist) ? hist : [] }),
-        tab === "look" && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Look, { ui: merged, setUi: update, goals, setGoals: (g) => {
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "dz-body", children: [
+        !store.ready && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(Callout, { title: "\u062C\u0627\u0631\u064A \u0627\u0644\u062A\u062D\u0645\u064A\u0644", tone: "note", children: "\u062B\u0648\u0627\u0646\u064A \u0648\u064A\u0638\u0647\u0631 \u0639\u062F\u0651\u0643 \u0627\u0644\u0645\u062D\u0641\u0648\u0638." }),
+        store.message && store.ready && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(Callout, { title: "\u062A\u0646\u0628\u064A\u0647 \u0627\u0644\u062D\u0641\u0638", tone: "warning", children: store.message }),
+        (tab === "count" || tab === "multi") && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(MicBar, { store }),
+        tab !== "count" && tab !== "multi" && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(MicStrip, {}),
+        tab === "count" && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(CountPage, { store, today: p.today, chains, sub, cu: cuApi }),
+        tab === "multi" && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(MultiPage, { store, today: p.today, chains, baseId, setBaseId: setBaseX }),
+        tab === "listen" && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(ListenPage, {}),
+        tab === "stats" && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(StatsPage, { store, start: startD, setStart: setStartD, hist: Array.isArray(hist) ? hist : [] }),
+        tab === "look" && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(Look, { ui: merged, setUi: update, goals, setGoals: (g) => {
           if (savedGoals.ready) setGoals(g);
         }, streak, backup, store })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsx)(NavBars, { tab, setTab: setTabX, sub, setSub: setSubX, where: "bottom" }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Closing, { children: "\u0627\u0644\u0639\u062F\u0651 \u0645\u062D\u0641\u0648\u0638 \u0639\u0644\u0649 \u0647\u0630\u0627 \u0627\u0644\u062C\u0647\u0627\u0632 \u0648\u062D\u0633\u0627\u0628\u0643 \u0641\u0642\u0637. \u0627\u0644\u0623\u0633\u0628\u0648\u0639 \u064A\u0628\u062F\u0623 \u0645\u0646 \u0627\u0644\u0633\u0628\u062A." })
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(NavBars, { tab, setTab: setTabX, sub, setSub: setSubX, where: "bottom" }),
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(Closing, { children: "\u0627\u0644\u0639\u062F\u0651 \u0645\u062D\u0641\u0648\u0638 \u0639\u0644\u0649 \u0647\u0630\u0627 \u0627\u0644\u062C\u0647\u0627\u0632 \u0648\u062D\u0633\u0627\u0628\u0643 \u0641\u0642\u0637. \u0627\u0644\u0623\u0633\u0628\u0648\u0639 \u064A\u0628\u062F\u0623 \u0645\u0646 \u0627\u0644\u0633\u0628\u062A." })
     ] }) }) }) });
   }
 
   // src/main.tsx
-  var import_jsx_runtime2 = __toESM(require_jsx_runtime());
-  (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime2.jsx)(FileRouter, { children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(App, {}) }));
+  var import_jsx_runtime3 = __toESM(require_jsx_runtime());
+  (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime3.jsx)(FileRouter, { children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(App, {}) }));
 })();
 /*! Bundled license information:
 
